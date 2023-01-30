@@ -22,15 +22,19 @@ class HighConeAction(Action):
         self.__position_delta_threshold = position_delta_threshold
         self.__Arm_Control_msg.extend = True
 
+    #Do not call these methods directly
     def start(self):
         self.arm_subsystem.publish(self.__Arm_Control_msg)
 
+    #Do not call these methods directly
     def update(self):
         pass
 
+    #Do not call these methods directly
     def done(self):
         pass
 
+    #Do not call these methods directly
     def isFinished(self) -> bool:
         if self.arm_subsystem.get() is None:
             rospy.logerr("No status update present from arm")
@@ -39,5 +43,6 @@ class HighConeAction(Action):
         return within(self.arm_subsystem.get().arm_base_actual_position, self.__Arm_Control_msg.arm_base_requested_position, self.__position_delta_threshold) and \
             within(self.arm_subsystem.get().arm_upper_actual_position, self.__Arm_Control_msg.arm_upper_requested_position, self.__position_delta_threshold)
 
+    #Do not call these methods directly
     def affectedSystems(self) -> List[Subsystem]:
         return { Subsystem.ARM }
