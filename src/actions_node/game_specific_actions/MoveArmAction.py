@@ -5,6 +5,7 @@ from frc_robot_utilities_py_node.SubsystemController import SubsystemController
 from ck_utilities_py_node.ckmath import *
 from typing import List
 from actions_node.game_specific_actions.Subsystem import Subsystem
+import json
 
 class MoveArmAction(Action):
     arm_subsystem = SubsystemController[Arm_Control, Arm_Status]('ArmControl', Arm_Control, 'ArmStatus', Arm_Status)
@@ -39,3 +40,9 @@ class MoveArmAction(Action):
     #Do not call these methods directly
     def affectedSystems(self) -> List[Subsystem]:
         return { Subsystem.ARM }
+    
+    @staticmethod
+    def from_json(json_dct):
+      return MoveArmAction(json_dct['arm_base_position'],
+                           json_dct['arm_upper_position'],
+                           json_dct['position_delta_threshold'])

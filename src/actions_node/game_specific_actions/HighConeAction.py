@@ -46,3 +46,8 @@ class HighConeAction(Action):
     #Do not call these methods directly
     def affectedSystems(self) -> List[Subsystem]:
         return { Subsystem.ARM }
+    
+    @staticmethod
+    def from_json(json_dct):
+      return HighConeAction(json_dct['position_delta_threshold'],
+                           json_dct['reversed'])
