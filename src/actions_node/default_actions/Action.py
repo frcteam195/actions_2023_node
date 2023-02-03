@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 from actions_node.game_specific_actions.Subsystem import Subsystem
 import json
+from actions_node.json_dispatcher import get_action
 
 class Action(ABC):
     @abstractmethod
@@ -33,8 +34,6 @@ class Action(ABC):
     def to_json(self):
         return self.__str__()
     
-    #TODO: not sure this works
     @staticmethod
-    @abstractmethod
-    def from_json(json_dct):
-        pass
+    def from_json(json_dct : dict):
+        return get_action(json_dct)

@@ -42,7 +42,7 @@ class MoveArmAction(Action):
         return { Subsystem.ARM }
     
     @staticmethod
-    def from_json(json_dct):
+    def from_json(json_dct : dict):
       return MoveArmAction(json_dct['arm_base_position'],
                            json_dct['arm_upper_position'],
                            json_dct['position_delta_threshold'])

@@ -48,6 +48,6 @@ class HighConeAction(Action):
         return { Subsystem.ARM }
     
     @staticmethod
-    def from_json(json_dct):
+    def from_json(json_dct : dict):
       return HighConeAction(json_dct['position_delta_threshold'],
                            json_dct['reversed'])
