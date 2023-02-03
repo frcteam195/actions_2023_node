@@ -9,16 +9,13 @@ from actions_node.game_specific_actions.Subsystem import Subsystem
 class InBotAction(Action):
     TARGET_ARM_BASE_POSITION = 0.3
     TARGET_UPPER_ARM_POSITION = 0.25
-    REVERSED_TARGET_ARM_BASE_POSITION = -0.3
-    REVERSED_TARGET_UPPER_ARM_POSITION = -0.25
-
 
     arm_subsystem = SubsystemController[Arm_Control, Arm_Status]('ArmControl', Arm_Control, 'ArmStatus', Arm_Status)
 
-    def __init__(self, position_delta_threshold: float = 0.1, reversed: bool = False):
+    def __init__(self, position_delta_threshold: float = 0.1):
         self.__Arm_Control_msg = Arm_Control()
-        self.__Arm_Control_msg.arm_base_requested_position = self.TARGET_ARM_BASE_POSITION if not reversed else self.REVERSED_TARGET_ARM_BASE_POSITION
-        self.__Arm_Control_msg.arm_upper_requested_position = self.TARGET_UPPER_ARM_POSITION if not reversed else self.REVERSED_TARGET_UPPER_ARM_POSITION
+        self.__Arm_Control_msg.arm_base_requested_position = self.TARGET_ARM_BASE_POSITION
+        self.__Arm_Control_msg.arm_upper_requested_position = self.TARGET_UPPER_ARM_POSITION
         self.__position_delta_threshold = position_delta_threshold
         self.__Arm_Control_msg.extend = True
 
