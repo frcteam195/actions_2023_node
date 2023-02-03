@@ -34,6 +34,9 @@ class Action(ABC):
     def to_json(self):
         return self.__str__()
     
-    @staticmethod
-    def from_json(json_dct : dict):
-        return get_action(json_dct)
+    # @staticmethod
+    # def from_json(json_dct : dict):
+    #     ret_list = []
+    #     for k,v in json_dct:
+    #         ret_list.append(get_action(k, v))
+    #     return SeriesAction(ret_list)

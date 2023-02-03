@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import List
 from actions_node.game_specific_actions.Subsystem import Subsystem
 import rospy
+from actions_node.json_dispatcher import get_action
 
 class SeriesAction(Action):
     def __init__(self, action_list:List[Action]):
@@ -47,3 +48,10 @@ class SeriesAction(Action):
         for a in self.__action_list:
             retlist.extend(a.affectedSystems())
         return retlist
+    
+    @staticmethod
+    def from_json(json_dct : dict):
+        ret_list = []
+        for k,v in json_dct:
+            ret_list.append(get_action(k, v))
+        return SeriesAction(ret_list)
