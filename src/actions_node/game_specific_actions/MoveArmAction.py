@@ -9,6 +9,8 @@ from actions_node.game_specific_actions.Subsystem import Subsystem
 class MoveArmAction(Action):
     arm_subsystem = SubsystemController[Arm_Control, Arm_Status]('ArmControl', Arm_Control, 'ArmStatus', Arm_Status)
 
+    HIGH_CUBE_NODE_BASE_ARM_POSITION = 0
+
     def __init__(self, arm_base_position : float, arm_upper_position : float, position_delta_threshold : float = 0.1):
         self.__Arm_Control_msg = Arm_Control()
         self.__Arm_Control_msg.arm_base_requested_position = arm_base_position
