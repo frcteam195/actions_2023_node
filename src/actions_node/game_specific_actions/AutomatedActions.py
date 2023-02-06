@@ -1,8 +1,23 @@
 from actions_node.default_actions.Action import Action
+from actions_node.default_actions.SeriesAction import SeriesAction
+from actions_node.default_actions.ParallelAction import ParallelAction
+from actions_node.default_actions.WaitAction import WaitAction
 from actions_node.game_specific_actions.MoveArmAction import MoveArmAction
 from actions_node.game_specific_actions.constant import ArmLowerJointForwardPositions, ArmLowerJointReversePositions, ArmUpperJointForwardPositions, ArmUpperJointReversePositions
 from actions_node.game_specific_actions import constant
 
+def ComplexActionExample() -> Action:
+    return SeriesAction([InRobotAction(),
+                         WaitAction(0.5),
+                         ParallelAction([HighCubeAction(True), ExtendArmAction()]), #This will put the arm out and go to high cube at the same time
+                         WaitAction(0.5),
+                         GroundAction(False)
+                         ])
+
+def ExtendArmAction() -> Action:
+    #TODO: Implement
+    pass
+    
 def HighCubeAction(reversed : bool) -> Action:
     return MoveArmAction(ArmUpperJointReversePositions.HighCube if reversed else ArmUpperJointForwardPositions.HighCube,
                          ArmLowerJointReversePositions.HighCube if reversed else ArmLowerJointForwardPositions.HighCube,

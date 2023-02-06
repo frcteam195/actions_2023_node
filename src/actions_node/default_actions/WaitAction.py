@@ -4,8 +4,9 @@ from typing import List
 from actions_node.game_specific_actions.Subsystem import Subsystem
 
 class WaitAction(Action):
-    def __init__(self, time_to_wait : float):
-        self.__time_to_wait = time_to_wait
+    """An action that waits for the specified amount of time in seconds"""
+    def __init__(self, time_to_wait_sec : float):
+        self.__time_to_wait = time_to_wait_sec
         self.__start_time = datetime.now()
 
     def start(self):
