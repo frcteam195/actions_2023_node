@@ -1,6 +1,8 @@
 from enum import Enum
 
 POSITION_DELTA_THRESHOLD = 0.05
+INTAKE_ACTUATION_TIME = 0.25
+ARM_EXTENSION_ACTUATION_TIME = 0.25
 
 class ArmUpperJointForwardPositions(float, Enum):
     HighCube = 0.25
