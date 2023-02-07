@@ -3,6 +3,9 @@ from typing import List
 from actions_node.game_specific_actions.Subsystem import Subsystem
 
 class Action(ABC):
+    """
+    An abstract class that defines an action. Actions must be designed to be non-blocking
+    """
     @abstractmethod
     def isFinished(self) -> bool:
         pass
