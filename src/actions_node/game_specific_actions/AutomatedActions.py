@@ -19,6 +19,7 @@ def ExtendArmAction() -> Action:
     pass
     
 def HighCubeAction(reversed : bool) -> Action:
+    print("HighCubeAction")
     return MoveArmAction(ArmUpperJointReversePositions.HighCube if reversed else ArmUpperJointForwardPositions.HighCube,
                          ArmLowerJointReversePositions.HighCube if reversed else ArmLowerJointForwardPositions.HighCube,
                          constant.POSITION_DELTA_THRESHOLD)
