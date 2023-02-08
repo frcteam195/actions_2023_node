@@ -3,7 +3,7 @@ from actions_node.default_actions.SeriesAction import SeriesAction
 from actions_node.default_actions.ParallelAction import ParallelAction
 from actions_node.default_actions.WaitAction import WaitAction
 from actions_node.game_specific_actions.MoveArmAction import MoveArmAction
-from actions_node.game_specific_actions.ArmExtensionControlAction import ArmExtensionControlAction
+from actions_node.game_specific_actions.MoveArmExtensionAction import MoveArmExtensionAction
 from actions_node.game_specific_actions.IntakeAction import IntakeAction
 from actions_node.game_specific_actions.constant import ArmPosition, ArmExtensionPosition, WristPosition
 from actions_node.game_specific_actions import constant
@@ -11,7 +11,7 @@ from actions_node.game_specific_actions import constant
 def ComplexActionExample() -> Action:
     return SeriesAction([InRobotAction(),
                          WaitAction(0.5),
-                         ParallelAction([HighCubeAction(True), ArmExtensionControlAction(ArmExtensionPosition.Extended)]), #This will put the arm out and go to high cube at the same time
+                         ParallelAction([HighCubeAction(True), MoveArmExtensionAction(ArmExtensionPosition.Extended)]), #This will put the arm out and go to high cube at the same time
                          ParallelAction([GroundAction(True), IntakeAction(False, 2)]), #This will put the arm the ground position and run the intake unpinched for 2 seconds
                          WaitAction(0.5),
                          GroundAction(False)

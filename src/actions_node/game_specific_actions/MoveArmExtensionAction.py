@@ -9,7 +9,7 @@ from actions_node.game_specific_actions.Subsystem import Subsystem
 from actions_node.game_specific_actions import constant
 from actions_node.game_specific_actions.constant import ArmExtensionPosition
 
-class ArmExtensionControlAction(Action):
+class MoveArmExtensionAction(Action):
     """
     An action to control the arm extension stage.
     """
