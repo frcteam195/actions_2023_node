@@ -3,6 +3,7 @@ from actions_node.default_actions.SeriesAction import SeriesAction
 from actions_node.default_actions.ParallelAction import ParallelAction
 from actions_node.default_actions.WaitAction import WaitAction
 from actions_node.game_specific_actions.MoveArmAction import MoveArmAction
+from actions_node.game_specific_actions.MoveWristAction import MoveWristAction
 from actions_node.game_specific_actions.MoveArmExtensionAction import MoveArmExtensionAction
 from actions_node.game_specific_actions.IntakeAction import IntakeAction
 from actions_node.game_specific_actions.constant import ArmPosition, ArmExtensionPosition, WristPosition
@@ -16,6 +17,21 @@ def ComplexActionExample() -> Action:
                          WaitAction(0.5),
                          GroundAction(False)
                          ])
+
+def WristStraight() -> Action:
+    return MoveWristAction(WristPosition.Zero)
+
+def WristLeft90() -> Action:
+    return MoveWristAction(WristPosition.Left_90)
+
+def WristLeft180() -> Action:
+    return MoveWristAction(WristPosition.Left_180)
+
+def WristRight90() -> Action:
+    return MoveWristAction(WristPosition.Right_90)
+
+def WristRight180() -> Action:
+    return MoveWristAction(WristPosition.Right_180)
 
 def HighCubeAction(reversed : bool) -> Action:
     return MoveArmAction(ArmPosition.HighCube, reversed)
