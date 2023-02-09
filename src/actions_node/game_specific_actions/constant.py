@@ -73,15 +73,15 @@ ArmLowerJointForwardPositions = {
     ArmPosition.Unchanged:-20.0,
     ##########################
     #Change these values
-    ArmPosition.HighCube:0.3,
-    ArmPosition.MidCube:0.3,
-    ArmPosition.LowCube:0.3,
-    ArmPosition.HighCone:0.3,
-    ArmPosition.MidCone:0.3,
-    ArmPosition.LowCone:0.3,
-    ArmPosition.Hybrid:0.3,
-    ArmPosition.Ground:0.3,
-    ArmPosition.InRobot:0.3
+    ArmPosition.HighCube:0.1,
+    ArmPosition.MidCube:0.1,
+    ArmPosition.LowCube:0.1,
+    ArmPosition.HighCone:0.1,
+    ArmPosition.MidCone:0.1,
+    ArmPosition.LowCone:0.1,
+    ArmPosition.Hybrid:0.1,
+    ArmPosition.Ground:0.1,
+    ArmPosition.InRobot:0.1
     ##########################
 }
 
@@ -89,14 +89,14 @@ ArmLowerJointReversePositions = {
     ArmPosition.Unchanged:-20.0,
     ##########################
     #Change these values
-    ArmPosition.HighCube:-0.3,
-    ArmPosition.MidCube:-0.3,
-    ArmPosition.LowCube:-0.3,
-    ArmPosition.HighCone:-0.3,
-    ArmPosition.MidCone:-0.3,
-    ArmPosition.LowCone:-0.3,
-    ArmPosition.Hybrid:-0.3,
-    ArmPosition.Ground:-0.3,
-    ArmPosition.InRobot:-0.3
+    ArmPosition.HighCube:-0.1,
+    ArmPosition.MidCube:-0.1,
+    ArmPosition.LowCube:-0.1,
+    ArmPosition.HighCone:-0.1,
+    ArmPosition.MidCone:-0.1,
+    ArmPosition.LowCone:-0.1,
+    ArmPosition.Hybrid:-0.1,
+    ArmPosition.Ground:-0.1,
+    ArmPosition.InRobot:-0.1
     ##########################
 }
