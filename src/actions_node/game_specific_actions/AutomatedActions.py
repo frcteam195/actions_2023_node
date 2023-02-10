@@ -34,7 +34,9 @@ def WristRight180() -> Action:
     return MoveWristAction(WristPosition.Right_180)
 
 def HighCubeAction(reversed : bool) -> Action:
-    return MoveArmAction(ArmPosition.HighCube, reversed)
+    return SeriesAction([MoveArmAction(ArmPosition.HighCube, reversed),
+                         MoveArmExtensionAction(ArmExtensionPosition.Extended)
+                         ])
 
 def MidCubeAction(reversed : bool) -> Action:
     return MoveArmAction(ArmPosition.MidCube, reversed)
