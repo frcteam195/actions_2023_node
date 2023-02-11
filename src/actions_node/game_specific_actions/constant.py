@@ -41,22 +41,6 @@ ArmUpperJointForwardPositions = {
     ArmPosition.Unchanged:-20.0,
     ##########################
     #Change these values
-    ArmPosition.HighCube:-0.25,
-    ArmPosition.MidCube:-0.25,
-    ArmPosition.LowCube:-0.25,
-    ArmPosition.HighCone:-0.25,
-    ArmPosition.MidCone:-0.25,
-    ArmPosition.LowCone:-0.25,
-    ArmPosition.Hybrid:-0.25,
-    ArmPosition.Ground:-0.25,
-    ArmPosition.InRobot:-0.25
-    ##########################
-}
-
-ArmUpperJointReversePositions = {
-    ArmPosition.Unchanged:-20.0,
-    ##########################
-    #Change these values
     ArmPosition.HighCube:0.25,
     ArmPosition.MidCube:0.25,
     ArmPosition.LowCube:0.25,
@@ -66,6 +50,22 @@ ArmUpperJointReversePositions = {
     ArmPosition.Hybrid:0.25,
     ArmPosition.Ground:0.25,
     ArmPosition.InRobot:0.25
+    ##########################
+}
+
+ArmUpperJointReversePositions = {
+    ArmPosition.Unchanged:-20.0,
+    ##########################
+    #Change these values
+    ArmPosition.HighCube:-0.25,
+    ArmPosition.MidCube:-0.25,
+    ArmPosition.LowCube:-0.25,
+    ArmPosition.HighCone:-0.25,
+    ArmPosition.MidCone:-0.25,
+    ArmPosition.LowCone:-0.25,
+    ArmPosition.Hybrid:-0.25,
+    ArmPosition.Ground:-0.25,
+    ArmPosition.InRobot:-0.25
     ##########################
 }
 
