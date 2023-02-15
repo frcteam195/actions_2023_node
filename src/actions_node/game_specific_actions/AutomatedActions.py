@@ -6,6 +6,8 @@ from actions_node.game_specific_actions.MoveArmAction import MoveArmAction
 from actions_node.game_specific_actions.MoveWristAction import MoveWristAction
 from actions_node.game_specific_actions.MoveArmExtensionAction import MoveArmExtensionAction
 from actions_node.game_specific_actions.IntakeAction import IntakeAction
+from actions_node.game_specific_actions.OuttakeAction import OuttakeAction
+from actions_node.game_specific_actions.StopIntakeAction import StopIntakeAction
 from actions_node.game_specific_actions.constant import ArmPosition, ArmExtensionPosition, WristPosition
 from actions_node.game_specific_actions import constant
 
@@ -61,3 +63,15 @@ def InRobotAction() -> Action:
 
 def GroundAction(reversed: bool) -> Action:
     return MoveArmAction(ArmPosition.Ground, reversed)
+
+def ScoreCube(reversed: bool) -> Action:
+    return SeriesAction([
+        HighCubeAction(reversed),
+        OuttakeAction(False, 0.2)
+    ])
+
+def ScoreCone(reversed: bool) -> Action:
+    return SeriesAction([
+        HighConeAction(reversed),
+        StopIntakeAction(False)
+    ])
