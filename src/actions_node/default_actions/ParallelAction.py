@@ -5,7 +5,6 @@ from actions_node.game_specific_actions.Subsystem import Subsystem
 
 class ParallelAction(Action):
     def __init__(self, action_list:List[Action]):
-        self.__current_action_index:int = -1
         self.__action_list:List[Action] = action_list
 
         for a in self.__action_list[:]:
@@ -13,12 +12,9 @@ class ParallelAction(Action):
                 print("Invalid action added to list")
                 self.__action_list.remove(a)
         
-        self.__current_action:Action = None
-        pass
-
     def start(self):
-        self.__current_action = None
-        self.__current_action_index = 0
+        for a in self.__action_list:
+            a.start()
 
     def update(self):
         for a in self.__action_list:
