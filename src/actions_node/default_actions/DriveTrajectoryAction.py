@@ -10,21 +10,12 @@ from ck_utilities_py_node.geometry import *
 class DriveTrajectoryAction(Action):
     """An action that drives a trajectory and waits for completion before ending"""
 
-<<<<<<< HEAD
     def __init__(self, autonomous_name : str, trajectory_index : int, start_pose : Pose = None):
-=======
-    def __init__(self, autonomous_name: str, trajectory_index: int, reset_pose: bool = False):
->>>>>>> b44e88ca0f4d250fd00c9ddec34b911eda86daa2
         self.__traj_status_subscriber = BufferedROSMsgHandlerPy(Trajectory_Status)
         self.__traj_status_subscriber.register_for_updates("/TrajectoryStatus")
         self.__autonomous_name = autonomous_name
         self.__trajectory_index = trajectory_index
-<<<<<<< HEAD
         self.__start_pose : Pose = start_pose
-        pass
-=======
-        self.__reset_pose = reset_pose
->>>>>>> b44e88ca0f4d250fd00c9ddec34b911eda86daa2
 
     def start(self):
         if self.__start_pose is not None:
