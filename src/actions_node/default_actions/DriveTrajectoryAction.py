@@ -9,12 +9,12 @@ from ck_ros_msgs_node.msg import Trajectory_Status
 class DriveTrajectoryAction(Action):
     """An action that drives a trajectory and waits for completion before ending"""
 
-    def __init__(self, trajectory : str, reset_pose : bool = False):
+    def __init__(self, autonomous_name: str, trajectory_index: int, reset_pose: bool = False):
         self.__traj_status_subscriber = BufferedROSMsgHandlerPy(Trajectory_Status)
         self.__traj_status_subscriber.register_for_updates("/TrajectoryStatus")
-        self.__trajectory_name = trajectory
+        self.__autonomous_name = autonomous_name
+        self.__trajectory_index = trajectory_index
         self.__reset_pose = reset_pose
-        pass
 
     def start(self):
         if self.__reset_pose:
