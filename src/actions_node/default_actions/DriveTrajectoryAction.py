@@ -24,7 +24,7 @@ class DriveTrajectoryAction(Action):
         auto_runner = rospy.ServiceProxy('/start_trajectory', StartTrajectory)
         auto_run_response : StartTrajectoryResponse = auto_runner(self.__autonomous_name, self.__trajectory_index)
         if not auto_run_response.accepted:
-            rospy.logerr("Failed to start trajectory %s: %d", self.__autonomous_name, self.__trajectory_index)
+            rospy.logerr(f"Failed to start trajectory {self.__autonomous_name}: {self.__trajectory_index}")
 
     def update(self):
         pass

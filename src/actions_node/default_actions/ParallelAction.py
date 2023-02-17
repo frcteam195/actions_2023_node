@@ -1,3 +1,4 @@
+import rospy
 from actions_node.default_actions.Action import Action
 from datetime import datetime
 from typing import List
@@ -9,7 +10,7 @@ class ParallelAction(Action):
 
         for a in self.__action_list[:]:
             if a is None:
-                print("Invalid action added to list")
+                rospy.logerr("Invalid action added to list")
                 self.__action_list.remove(a)
         
     def start(self):

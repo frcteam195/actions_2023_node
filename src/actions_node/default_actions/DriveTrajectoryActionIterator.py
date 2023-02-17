@@ -24,17 +24,17 @@ class DriveTrajectoryActionIterator():
                 self.__auto_start_pose.orientation.yaw = auto_info_response.heading_degrees
 
             if self.__expected_trajectory_count != self.__trajectory_count:
-                rospy.logerr("Expected trajectory count for %s is not correct. Expecting %d but got %d" % (self.__autonomous_name, self.__expected_trajectory_count, self.__trajectory_count))
+                rospy.logerr(f"Expected trajectory count for {self.__autonomous_name} is not correct. Expecting {self.__expected_trajectory_count} but got {self.__trajectory_count}")
 
         except rospy.ServiceException as e:
-            rospy.logerr(f"Service call failed {e}" % e)
+            rospy.logerr(f"Service call failed {e}")
         
     def get_next_trajectory_action(self) -> DriveTrajectoryAction:
         curr_iterator = self.__trajectory_index_iterator
         self.__trajectory_index_iterator = self.__trajectory_index_iterator + 1
 
         if curr_iterator >= self.__trajectory_count:
-            rospy.logerr("Index out of range for trajectory %d in auto %s" % (curr_iterator, self.__autonomous_name))
+            rospy.logerr(f"Index out of range for trajectory {curr_iterator} in auto {self.__autonomous_name}")
             return None
 
         if curr_iterator == 0:

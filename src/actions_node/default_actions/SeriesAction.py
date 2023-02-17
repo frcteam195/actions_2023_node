@@ -11,7 +11,7 @@ class SeriesAction(Action):
 
         for a in self.__action_list[:]:
             if a is None:
-                print("Invalid action added to list")
+                rospy.logerr("Invalid action added to list")
                 self.__action_list.remove(a)
 
         self.__current_action:Action = None
