@@ -19,7 +19,7 @@ class DriveTrajectoryAction(Action):
 
     def start(self):
         if self.__start_pose is not None:
-            reset_robot_pose(self.__start_pose.position.x(), self.__start_pose.position.y(), self.__start_pose.orientation.yaw)
+            reset_robot_pose(self.__start_pose.position.x, self.__start_pose.position.y, self.__start_pose.orientation.yaw)
 
         auto_runner = rospy.ServiceProxy('/start_trajectory', StartTrajectory)
         auto_run_response : StartTrajectoryResponse = auto_runner(self.__autonomous_name, self.__trajectory_index)
