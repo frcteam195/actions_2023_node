@@ -5,27 +5,27 @@ from frc_robot_utilities_py_node.frc_robot_utilities_py import *
 from actions_node.game_specific_actions.Subsystem import Subsystem
 from swerve_trajectory_node.srv import StartTrajectory, StartTrajectoryResponse, GetStartPose, GetStartPoseResponse
 from ck_ros_msgs_node.msg import Trajectory_Status
+from ck_utilities_py_node.geometry import *
 
 class DriveTrajectoryAction(Action):
     """An action that drives a trajectory and waits for completion before ending"""
 
-    def __init__(self, trajectory : str, reset_pose : bool = False):
+    def __init__(self, autonomous_name : str, trajectory_index : int, start_pose : Pose = None):
         self.__traj_status_subscriber = BufferedROSMsgHandlerPy(Trajectory_Status)
         self.__traj_status_subscriber.register_for_updates("/TrajectoryStatus")
-        self.__trajectory_name = trajectory
-        self.__reset_pose = reset_pose
+        self.__autonomous_name = autonomous_name
+        self.__trajectory_index = trajectory_index
+        self.__start_pose : Pose = start_pose
         pass
 
     def start(self):
-        if self.__reset_pose:
-            get_pose = rospy.ServiceProxy('/get_start_pose', GetStartPose)
-            start_pose: GetStartPoseResponse = get_pose(self.__trajectory_name)
-            reset_robot_pose(start_pose.x_inches, start_pose.y_inches, start_pose.heading_degrees)
+        if self.__start_pose is not None:
+            reset_robot_pose(self.__start_pose.position.x(), self.__start_pose.position.y(), self.__start_pose.orientation.yaw)
 
         auto_runner = rospy.ServiceProxy('/start_trajectory', StartTrajectory)
-        auto_run_response : StartTrajectoryResponse = auto_runner(self.__trajectory_name)
+        auto_run_response : StartTrajectoryResponse = auto_runner(self.__autonomous_name, self.__trajectory_index)
         if not auto_run_response.accepted:
-            rospy.logerr("Failed to start trajectory %s", self.__trajectory_name)
+            rospy.logerr("Failed to start trajectory %s: %d", self.__autonomous_name, self.__trajectory_index)
 
     def update(self):
         pass
