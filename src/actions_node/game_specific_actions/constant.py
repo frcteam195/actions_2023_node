@@ -31,8 +31,6 @@ class WristPosition(float, Enum):
     Zero = 0.0,
     Left_90 = 0.25,
     Left_180 = 0.5,
-    Right_90 = -0.25,
-    Right_180 = -0.5
     ##########################
 
 
