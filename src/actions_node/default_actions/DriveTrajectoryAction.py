@@ -3,7 +3,7 @@ from actions_node.default_actions.Action import Action
 from typing import List
 from frc_robot_utilities_py_node.frc_robot_utilities_py import *
 from actions_node.game_specific_actions.Subsystem import Subsystem
-from swerve_trajectory_node.srv import StartTrajectory, StartTrajectoryResponse, GetStartPose, GetStartPoseResponse
+from swerve_trajectory_node.srv import StartTrajectory, StartTrajectoryResponse
 from ck_ros_msgs_node.msg import Trajectory_Status
 from ck_utilities_py_node.geometry import *
 
