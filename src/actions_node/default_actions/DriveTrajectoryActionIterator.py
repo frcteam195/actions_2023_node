@@ -41,3 +41,6 @@ class DriveTrajectoryActionIterator():
             return DriveTrajectoryAction(self.__autonomous_name, curr_iterator, self.__auto_start_pose)
         else:
             return DriveTrajectoryAction(self.__autonomous_name, curr_iterator)
+        
+    def reset_iterator(self):
+        self.__trajectory_index_iterator = 0
