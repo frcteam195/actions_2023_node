@@ -1,7 +1,6 @@
 from actions_node.default_actions.Action import Action
 from ck_ros_msgs_node.msg import Intake_Control, Intake_Status
 import rospy
-from datetime import datetime
 from frc_robot_utilities_py_node.SubsystemController import SubsystemController
 from ck_utilities_py_node.ckmath import *
 from typing import List
@@ -22,20 +21,20 @@ class PlaceHighConeAction(Action):
         self.__Intake_Control_msg.pincher_solenoid_on = False
         self.__intake_delay_s = intake_delay_s
         self.__intake_run_time_s = intake_run_time_s
-        self.__start_time = datetime.now()
+        self.__start_time = rospy.Time().now()
 
     #Do not call these methods directly
     def start(self):
         self.intake_subsystem.publish(self.__Intake_Control_msg)
-        self.__start_time = datetime.now()
+        self.__start_time = rospy.Time().now()
 
     #Do not call these methods directly
     def update(self):
-        duration = datetime.now() - self.__start_time
-        if duration.total_seconds() > self.__intake_delay_s:
+        duration = rospy.Time().now() - self.__start_time
+        if duration.to_sec() > self.__intake_delay_s:
             self.__Intake_Control_msg.pincher_solenoid_on = True
 
-        if duration.total_seconds() > self.__intake_run_time_s:
+        if duration.to_sec() > self.__intake_run_time_s:
             self.__Intake_Control_msg.rollers_outtake = False
 
         self.intake_subsystem.publish(self.__Intake_Control_msg)
@@ -51,12 +50,12 @@ class PlaceHighConeAction(Action):
         if self.intake_subsystem.get() is None:
             rospy.logerr("No status update present from intake")
             return False
-        
-        duration = datetime.now() - self.__start_time
+
+        duration = rospy.Time().now() - self.__start_time
         if self.__intake_run_time_s >= 0:
-            return duration.total_seconds() > constant.INTAKE_ACTUATION_TIME + self.__intake_run_time_s
+            return duration.to_sec() > constant.INTAKE_ACTUATION_TIME + self.__intake_run_time_s
         else:
-            return duration.total_seconds() > constant.INTAKE_ACTUATION_TIME
+            return duration.to_sec() > constant.INTAKE_ACTUATION_TIME
 
     #Do not call these methods directly
     def affectedSystems(self) -> List[Subsystem]:
