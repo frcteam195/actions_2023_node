@@ -3,10 +3,20 @@
 import rospy
 from frc_robot_utilities_py_node.RobotStatusHelperPy import RobotMode
 from actions_node.default_actions.Action import Action
+from actions_node.game_specific_actions.Subsystem import Subsystem
+from typing import List
 
 class ActionRunner:
     def __init__(self) -> None:
-        self.__active_action_list:list[Action] = []
+        self.__active_action_list:List[Action] = []
+
+    def get_operated_systems(self) -> List[Subsystem]:
+        b = []
+        for a in self.__active_action_list:
+            for s in a.affectedSystems():
+                b.append(s)
+        return b
+
 
     def start_action(self, new_action:Action):
         try:

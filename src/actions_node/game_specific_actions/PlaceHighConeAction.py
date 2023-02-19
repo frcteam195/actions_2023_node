@@ -8,30 +8,20 @@ from typing import List
 from actions_node.game_specific_actions.Subsystem import Subsystem
 from actions_node.game_specific_actions import constant
 
-class OuttakeAction(Action):
+class PlaceHighConeAction(Action):
     """
-    An action to run the intake in the outward direction.
+    An action to place the High Cone
     """
 
     intake_subsystem = SubsystemController[Intake_Control, Intake_Status]('IntakeControl', Intake_Control, 'IntakeStatus', Intake_Status)
 
-    def __init__(self, pinched : bool, time_to_outtake_s : float = -1):
-        """
-        Parameters
-        ----------
-        pinched : bool
-            If True, the intake is pinched closed. If False, the intake is opened
-        time_to_outtake_s : float
-            An optional parameter of how long to run the intake for.
-            Not specifying this parameter will just turn the intake on without stopping it at the end of the action.
-            (You would need to run a StopIntakeAction)
-        """
-        
+    def __init__(self, intake_delay_s : float = 0.05, intake_run_time_s : float = 0.035):
         self.__Intake_Control_msg = Intake_Control()
         self.__Intake_Control_msg.rollers_intake = False
         self.__Intake_Control_msg.rollers_outtake = True
-        self.__Intake_Control_msg.pincher_solenoid_on = not pinched
-        self.__time_to_outtake_s = time_to_outtake_s
+        self.__Intake_Control_msg.pincher_solenoid_on = False
+        self.__intake_delay_s = intake_delay_s
+        self.__intake_run_time_s = intake_run_time_s
         self.__start_time = datetime.now()
 
     #Do not call these methods directly
@@ -41,14 +31,20 @@ class OuttakeAction(Action):
 
     #Do not call these methods directly
     def update(self):
-        pass
+        duration = datetime.now() - self.__start_time
+        if duration.total_seconds() > self.__intake_delay_s:
+            self.__Intake_Control_msg.pincher_solenoid_on = True
+
+        if duration.total_seconds() > self.__intake_run_time_s:
+            self.__Intake_Control_msg.rollers_outtake = False
+
+        self.intake_subsystem.publish(self.__Intake_Control_msg)
 
     #Do not call these methods directly
     def done(self):
-        if self.__time_to_outtake_s >= 0:
-            self.__Intake_Control_msg.rollers_intake = False
-            self.__Intake_Control_msg.rollers_outtake = False
-            self.intake_subsystem.publish(self.__Intake_Control_msg)
+        self.__Intake_Control_msg.rollers_intake = False
+        self.__Intake_Control_msg.rollers_outtake = False
+        self.intake_subsystem.publish(self.__Intake_Control_msg)
 
     #Do not call these methods directly
     def isFinished(self) -> bool:
@@ -57,8 +53,8 @@ class OuttakeAction(Action):
             return False
         
         duration = datetime.now() - self.__start_time
-        if self.__time_to_outtake_s >= 0:
-            return duration.total_seconds() > constant.INTAKE_ACTUATION_TIME + self.__time_to_outtake_s
+        if self.__intake_run_time_s >= 0:
+            return duration.total_seconds() > constant.INTAKE_ACTUATION_TIME + self.__intake_run_time_s
         else:
             return duration.total_seconds() > constant.INTAKE_ACTUATION_TIME
 
