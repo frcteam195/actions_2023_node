@@ -15,7 +15,7 @@ class PlaceHighConeAction(Action):
 
     intake_subsystem = SubsystemController[Intake_Control, Intake_Status]('IntakeControl', Intake_Control, 'IntakeStatus', Intake_Status)
 
-    def __init__(self, intake_delay_s : float = 0.05, intake_run_time_s : float = 0.035):
+    def __init__(self, intake_delay_s : float = 0.05, intake_run_time_s : float = 0.030):
         self.__Intake_Control_msg = Intake_Control()
         self.__Intake_Control_msg.rollers_intake = False
         self.__Intake_Control_msg.rollers_outtake = True
