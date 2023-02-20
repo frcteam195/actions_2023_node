@@ -10,7 +10,7 @@ from actions_node.game_specific_actions import constant
 class MoveArmAction(Action):
     arm_subsystem = SubsystemController[Arm_Goal, Arm_Status]('ArmGoal', Arm_Goal, 'ArmStatus', Arm_Status)
 
-    def __init__(self, arm_goal : int, arm_goal_side : int, wrist_goal : int):
+    def __init__(self, arm_goal : int, arm_goal_side : int, wrist_goal : int = 0):
         self.__Arm_Goal_msg = Arm_Goal()
         self.__Arm_Goal_msg.goal = arm_goal
         self.__Arm_Goal_msg.goal_side = arm_goal_side
