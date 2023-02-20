@@ -11,67 +11,54 @@ from actions_node.game_specific_actions.StopIntakeAction import StopIntakeAction
 from actions_node.game_specific_actions.constant import ArmPosition, ArmExtensionPosition, WristPosition
 from actions_node.game_specific_actions import constant
 
-def ComplexActionExample() -> Action:
-    return SeriesAction([InRobotAction(),
-                         WaitAction(0.5),
-                         ParallelAction([HighCubeAction(True), MoveArmExtensionAction(ArmExtensionPosition.Extended)]), #This will put the arm out and go to high cube at the same time
-                         ParallelAction([GroundAction(True), IntakeAction(False, 2)]), #This will put the arm the ground position and run the intake unpinched for 2 seconds
-                         WaitAction(0.5),
-                         GroundAction(False)
-                         ])
+from ck_ros_msgs_node.msg import Arm_Goal
 
-def WristStraight() -> Action:
-    return MoveWristAction(WristPosition.Zero)
-
-def WristLeft90() -> Action:
-    return MoveWristAction(WristPosition.Left_90)
-
-def WristLeft180() -> Action:
-    return MoveWristAction(WristPosition.Left_180)
-
-def WristRight90() -> Action:
-    return MoveWristAction(WristPosition.Right_90)
-
-def WristRight180() -> Action:
-    return MoveWristAction(WristPosition.Right_180)
-
-def HighCubeAction(reversed : bool) -> Action:
-    return SeriesAction([MoveArmAction(ArmPosition.HighCube, reversed),
-                         MoveArmExtensionAction(ArmExtensionPosition.Extended)
-                         ])
-
-def MidCubeAction(reversed : bool) -> Action:
-    return MoveArmAction(ArmPosition.MidCube, reversed)
-
-def LowCubeAction(reversed : bool) -> Action:
-    return MoveArmAction(ArmPosition.LowCube, reversed)
-
-def HighConeAction(reversed : bool) -> Action:
-    return MoveArmAction(ArmPosition.HighCone, reversed)
-
-def MidConeAction(reversed : bool) -> Action:
-    return MoveArmAction(ArmPosition.MidCone, reversed)
-
-def LowConeAction(reversed : bool) -> Action:
-    return MoveArmAction(ArmPosition.LowCone, reversed)
-
-def HybridAction(reversed : bool) -> Action:
-    return MoveArmAction(ArmPosition.Hybrid, reversed)
-
-def InRobotAction() -> Action:
-    return MoveArmAction(ArmPosition.InRobot, False)
-
-def GroundAction(reversed: bool) -> Action:
-    return MoveArmAction(ArmPosition.Ground, reversed)
-
-def ScoreCube(reversed: bool) -> Action:
+def ScoreCubeHigh() -> Action:
+    """
+    Moves to high cube position and outtake.
+    """
     return SeriesAction([
-        HighCubeAction(reversed),
+        MoveArmAction(Arm_Goal.HIGH_CUBE, Arm_Goal.SIDE_AUTO),
         OuttakeAction(False, 0.2)
     ])
 
-def ScoreCone(reversed: bool) -> Action:
+def ScoreConeHigh() -> Action:
+    """
+    Moves to high cone position, outtakes, and unpinches.
+    """
     return SeriesAction([
-        HighConeAction(reversed),
-        StopIntakeAction(False)
+        MoveArmAction(Arm_Goal.HIGH_CONE, Arm_Goal.SIDE_AUTO),
+        OuttakeAction(True, 0.1),
+        OuttakeAction(False, 0.1)
+    ])
+
+def ScoreCubeMiddle() -> Action:
+    """
+    Moves to middle cube position and outtake.
+    """
+    return SeriesAction([
+        MoveArmAction(Arm_Goal.MID_CUBE, Arm_Goal.SIDE_AUTO),
+        OuttakeAction(False, 0.2)
+    ])
+
+def ScoreConeMiddle() -> Action:
+    """
+    Moves to middle cone position, outtakes, and unpinches.
+    """
+    return SeriesAction([
+        MoveArmAction(Arm_Goal.MID_CONE, Arm_Goal.SIDE_AUTO),
+        OuttakeAction(True, 0.1),
+        OuttakeAction(False, 0.1)
+    ])
+
+def IntakeConeGround(side: int) -> Action:
+    """
+    Moves to the ground intake position and runs the intake.
+    """
+    return SeriesAction([
+        ParallelAction([
+            MoveArmAction(Arm_Goal.GROUND_CONE, side),
+            IntakeAction(True, 0)
+        ]),
+        IntakeAction(True, 0.5)
     ])
