@@ -13,40 +13,40 @@ from actions_node.game_specific_actions import constant
 
 from ck_ros_msgs_node.msg import Arm_Goal
 
-def ScoreCubeHigh() -> Action:
+def ScoreCubeHigh(side: int) -> Action:
     """
     Moves to high cube position and outtake.
     """
     return SeriesAction([
-        MoveArmAction(Arm_Goal.HIGH_CUBE, Arm_Goal.SIDE_AUTO),
+        MoveArmAction(Arm_Goal.HIGH_CUBE, side),
         OuttakeAction(False, 0.2)
     ])
 
-def ScoreConeHigh() -> Action:
+def ScoreConeHigh(side: int) -> Action:
     """
     Moves to high cone position, outtakes, and unpinches.
     """
     return SeriesAction([
-        MoveArmAction(Arm_Goal.HIGH_CONE, Arm_Goal.SIDE_AUTO),
+        MoveArmAction(Arm_Goal.HIGH_CONE, side),
         OuttakeAction(True, 0.1),
         OuttakeAction(False, 0.1)
     ])
 
-def ScoreCubeMiddle() -> Action:
+def ScoreCubeMiddle(side: int) -> Action:
     """
     Moves to middle cube position and outtake.
     """
     return SeriesAction([
-        MoveArmAction(Arm_Goal.MID_CUBE, Arm_Goal.SIDE_AUTO),
+        MoveArmAction(Arm_Goal.MID_CUBE, side),
         OuttakeAction(False, 0.2)
     ])
 
-def ScoreConeMiddle() -> Action:
+def ScoreConeMiddle(side: int) -> Action:
     """
     Moves to middle cone position, outtakes, and unpinches.
     """
     return SeriesAction([
-        MoveArmAction(Arm_Goal.MID_CONE, Arm_Goal.SIDE_AUTO),
+        MoveArmAction(Arm_Goal.MID_CONE, side),
         OuttakeAction(True, 0.1),
         OuttakeAction(False, 0.1)
     ])
