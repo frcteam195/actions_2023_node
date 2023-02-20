@@ -7,10 +7,12 @@ from swerve_trajectory_node.srv import StartTrajectory, StartTrajectoryResponse
 from ck_ros_msgs_node.msg import Trajectory_Status
 from ck_utilities_py_node.geometry import *
 
+
 class DriveTrajectoryAction(Action):
     """An action that drives a trajectory and waits for completion before ending"""
 
     def __init__(self, autonomous_name : str, trajectory_index : int, start_pose : Pose = None):
+        register_for_robot_updates()
         self.__traj_status_subscriber = BufferedROSMsgHandlerPy(Trajectory_Status)
         self.__traj_status_subscriber.register_for_updates("/TrajectoryStatus")
         self.__autonomous_name = autonomous_name
@@ -19,7 +21,7 @@ class DriveTrajectoryAction(Action):
 
     def start(self):
         if self.__start_pose is not None:
-            reset_robot_pose(self.__start_pose.position.x, self.__start_pose.position.y, self.__start_pose.orientation.yaw)
+            reset_robot_pose(robot_status.get_alliance(), self.__start_pose.position.x, self.__start_pose.position.y, self.__start_pose.orientation.yaw)
 
         rospy.wait_for_service('/start_trajectory')
         auto_runner = rospy.ServiceProxy('/start_trajectory', StartTrajectory)
