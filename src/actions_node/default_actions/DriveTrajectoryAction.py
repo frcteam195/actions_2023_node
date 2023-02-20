@@ -38,7 +38,7 @@ class DriveTrajectoryAction(Action):
     def isFinished(self) -> bool:
         traj_status : Trajectory_Status = self.__traj_status_subscriber.get()
         if traj_status is not None:
-            return traj_status.is_completed
+            return traj_status.is_completed and traj_status.trajectory_index == self.__trajectory_index
         return False
 
     def affectedSystems(self) -> List[Subsystem]:
