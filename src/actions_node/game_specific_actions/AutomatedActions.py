@@ -19,17 +19,17 @@ def ScoreCubeHigh(side: int) -> Action:
     """
     return SeriesAction([
         MoveArmAction(Arm_Goal.HIGH_CUBE, side),
-        OuttakeAction(False, 0.2)
+        OuttakeAction(True, 0.5)
     ])
 
-def ScoreConeHigh(side: int) -> Action:
+def ScoreConeHigh(side: int, wrist_goal: int = 0) -> Action:
     """
     Moves to high cone position, outtakes, and unpinches.
     """
     return SeriesAction([
-        MoveArmAction(Arm_Goal.HIGH_CONE, side),
-        OuttakeAction(True, 0.1),
-        OuttakeAction(False, 0.1)
+        MoveArmAction(Arm_Goal.HIGH_CONE, side, wrist_goal),
+        WaitAction(1.0),
+        OuttakeAction(False, 0.0)
     ])
 
 def ScoreCubeMiddle(side: int) -> Action:

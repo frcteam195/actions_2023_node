@@ -34,8 +34,8 @@ class MoveArmAction(Action):
             rospy.logerr("No status update present from arm")
             return False
 
-        return self.arm_subsystem.get().arm_at_setpoint
-    
+        return self.arm_subsystem.get().goal.goal == self.__Arm_Goal_msg.goal and self.arm_subsystem.get().arm_at_setpoint
+
     #Do not call these methods directly
     def affectedSystems(self) -> List[Subsystem]:
         return { Subsystem.ARM }

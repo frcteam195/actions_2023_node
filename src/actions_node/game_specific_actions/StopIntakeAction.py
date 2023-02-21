@@ -26,7 +26,7 @@ class StopIntakeAction(Action):
         self.__Intake_Control_msg = Intake_Control()
         self.__Intake_Control_msg.rollers_intake = False
         self.__Intake_Control_msg.rollers_outtake = False
-        self.__Intake_Control_msg.pincher_solenoid_on = pinched
+        self.__Intake_Control_msg.pinched = pinched
         self.__start_time = datetime.now()
 
     #Do not call these methods directly

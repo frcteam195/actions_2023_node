@@ -30,7 +30,7 @@ class OuttakeAction(Action):
         self.__Intake_Control_msg = Intake_Control()
         self.__Intake_Control_msg.rollers_intake = False
         self.__Intake_Control_msg.rollers_outtake = True
-        self.__Intake_Control_msg.pincher_solenoid_on = pinched
+        self.__Intake_Control_msg.pinched = pinched
         self.__time_to_outtake_s = time_to_outtake_s
         self.__start_time = datetime.now()
 

@@ -18,7 +18,7 @@ class PlaceHighConeAction(Action):
         self.__Intake_Control_msg = Intake_Control()
         self.__Intake_Control_msg.rollers_intake = False
         self.__Intake_Control_msg.rollers_outtake = True
-        self.__Intake_Control_msg.pincher_solenoid_on = False
+        self.__Intake_Control_msg.pinched = False
         self.__intake_delay_s = intake_delay_s
         self.__intake_run_time_s = intake_run_time_s
         self.__start_time = rospy.Time().now()
@@ -32,7 +32,7 @@ class PlaceHighConeAction(Action):
     def update(self):
         duration = rospy.Time().now() - self.__start_time
         if duration.to_sec() > self.__intake_delay_s:
-            self.__Intake_Control_msg.pincher_solenoid_on = True
+            self.__Intake_Control_msg.pinched = True
 
         if duration.to_sec() > self.__intake_run_time_s:
             self.__Intake_Control_msg.rollers_outtake = False
