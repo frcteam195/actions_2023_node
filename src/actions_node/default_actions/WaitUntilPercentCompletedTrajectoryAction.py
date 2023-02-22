@@ -3,13 +3,12 @@ from actions_node.default_actions.Action import Action
 from typing import List
 from frc_robot_utilities_py_node.frc_robot_utilities_py import *
 from actions_node.game_specific_actions.Subsystem import Subsystem
-from swerve_trajectory_node.srv import StartTrajectory, StartTrajectoryResponse
 from ck_ros_msgs_node.msg import Trajectory_Status
 from ck_utilities_py_node.geometry import *
 
 
 class WaitUntilPercentCompletedTrajectoryAction(Action):
-    """An action that drives a trajectory and waits for completion before ending"""
+    """An action that waits until a trajectory has reached a certain completion percentage"""
 
     def __init__(self, trajectory_index : int, percent_to_wait_until : float):
         register_for_robot_updates()
