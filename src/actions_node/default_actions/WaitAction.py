@@ -23,4 +23,4 @@ class WaitAction(Action):
         return duration.total_seconds() > self.__time_to_wait
 
     def affectedSystems(self) -> List[Subsystem]:
-        return { Subsystem.NONE }
+        return [ Subsystem.NONE ]

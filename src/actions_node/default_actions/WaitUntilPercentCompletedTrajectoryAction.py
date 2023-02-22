@@ -8,26 +8,18 @@ from ck_ros_msgs_node.msg import Trajectory_Status
 from ck_utilities_py_node.geometry import *
 
 
-class DriveTrajectoryAction(Action):
+class WaitUntilPercentCompletedTrajectoryAction(Action):
     """An action that drives a trajectory and waits for completion before ending"""
 
-    def __init__(self, autonomous_name : str, trajectory_index : int, start_pose : Pose = None):
+    def __init__(self, trajectory_index : int, percent_to_wait_until : float):
         register_for_robot_updates()
         self.__traj_status_subscriber = BufferedROSMsgHandlerPy(Trajectory_Status)
         self.__traj_status_subscriber.register_for_updates("/TrajectoryStatus")
-        self.__autonomous_name = autonomous_name
         self.__trajectory_index = trajectory_index
-        self.__start_pose : Pose = start_pose
+        self.__trajectory_wait_until_percent = percent_to_wait_until
 
     def start(self):
-        if self.__start_pose is not None:
-            reset_robot_pose(robot_status.get_alliance(), self.__start_pose.position.x, self.__start_pose.position.y, self.__start_pose.orientation.yaw)
-
-        rospy.wait_for_service('/start_trajectory')
-        auto_runner = rospy.ServiceProxy('/start_trajectory', StartTrajectory)
-        auto_run_response : StartTrajectoryResponse = auto_runner(self.__autonomous_name, self.__trajectory_index)
-        if not auto_run_response.accepted:
-            rospy.logerr(f"Failed to start trajectory {self.__autonomous_name}: {self.__trajectory_index}")
+        pass
 
     def update(self):
         pass
@@ -38,8 +30,8 @@ class DriveTrajectoryAction(Action):
     def isFinished(self) -> bool:
         traj_status : Trajectory_Status = self.__traj_status_subscriber.get()
         if traj_status is not None:
-            return traj_status.is_completed and traj_status.trajectory_index == self.__trajectory_index
+            return traj_status.progress >= self.__trajectory_wait_until_percent and traj_status.trajectory_index == self.__trajectory_index
         return False
 
     def affectedSystems(self) -> List[Subsystem]:
-        return [ Subsystem.DRIVEBASE ]
+        return [ Subsystem.NONE ]

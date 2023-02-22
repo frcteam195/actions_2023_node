@@ -59,4 +59,4 @@ class PlaceHighConeAction(Action):
 
     #Do not call these methods directly
     def affectedSystems(self) -> List[Subsystem]:
-        return { Subsystem.INTAKE }
+        return [ Subsystem.INTAKE ]

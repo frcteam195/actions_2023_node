@@ -43,4 +43,4 @@ class MoveWristAction(Action):
         return within(self.arm_subsystem.get().arm_wrist_actual_position, self.__Arm_Control_msg.arm_wrist_requested_position, self.__position_delta_threshold)
     #Do not call these methods directly
     def affectedSystems(self) -> List[Subsystem]:
-        return { Subsystem.ARM }
+        return [ Subsystem.ARM ]
