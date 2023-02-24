@@ -19,7 +19,7 @@ def ScoreCubeHigh(side: int) -> Action:
     """
     return SeriesAction([
         MoveArmAction(Arm_Goal.HIGH_CUBE, side),
-        OuttakeAction(True, 0.5)
+        OuttakeAction(True, 0.2)
     ])
 
 def ScoreConeHigh(side: int, wrist_goal: int = 0) -> Action:
@@ -28,7 +28,6 @@ def ScoreConeHigh(side: int, wrist_goal: int = 0) -> Action:
     """
     return SeriesAction([
         MoveArmAction(Arm_Goal.HIGH_CONE, side, wrist_goal),
-        WaitAction(1.0),
         OuttakeAction(False, 0.0)
     ])
 
