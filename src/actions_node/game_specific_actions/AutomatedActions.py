@@ -41,12 +41,12 @@ def ScoreCubeMiddle(side: int) -> Action:
         OuttakeAction(False, 0.2)
     ])
 
-def ScoreConeMiddle(side: int) -> Action:
+def ScoreConeMiddle(side: int, wrist_goal: int = 0) -> Action:
     """
     Moves to middle cone position, outtakes, and unpinches.
     """
     return SeriesAction([
-        MoveArmAction(Arm_Goal.MID_CONE, side),
+        MoveArmAction(Arm_Goal.MID_CONE, side, wrist_goal),
         OuttakeAction(True, 0.1),
         OuttakeAction(False, 0.1)
     ])
