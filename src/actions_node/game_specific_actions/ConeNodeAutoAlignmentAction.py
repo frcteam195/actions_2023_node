@@ -1,7 +1,9 @@
 from actions_node.default_actions.Action import Action
 import rospy
 from frc_robot_utilities_py_node.SubsystemController import SubsystemController
+from frc_robot_utilities_py_node.RobotStatusHelperPy import Alliance
 from ck_utilities_py_node.ckmath import *
+from ck_utilities_py_node.geometry import *
 from typing import List, Callable
 from actions_node.game_specific_actions.Subsystem import Subsystem
 from limelight_vision_node.msg import Limelight_Control, Limelight_Status, Limelight, Limelight_Info
@@ -28,9 +30,23 @@ limelight_vision_pipelines = {
 class ConeNodeAutoAlignmentAction(Action):
     limelight_subsystem = SubsystemController[Limelight_Control, Limelight_Status]('LimelightControl', Limelight_Control, 'LimelightStatus', Limelight_Status)
 
-    def __init__(self, side : int, is_finished_condition : Callable[[], bool]):
+    def __init__(self, alliance : Alliance,  side : int, is_finished_condition : Callable[[], bool]):
         self.__is_finished_condition = is_finished_condition
         self.__side = side
+        self.__alliance = alliance
+        
+        desired_heading = Rotation()
+        if self.__side == Arm_Goal.SIDE_FRONT and self.__alliance == Alliance.RED:
+            desired_heading.yaw = 180
+        elif self.__side == Arm_Goal.SIDE_FRONT and self.__alliance == Alliance.BLUE:
+            desired_heading.yaw = 0
+        elif self.__side == Arm_Goal.SIDE_BACK and self.__alliance == Alliance.RED:
+            desired_heading.yaw = 0
+        elif self.__side == Arm_Goal.SIDE_BACK and self.__alliance == Alliance.BLUE:
+            desired_heading.yaw = 180
+        
+        self.__desired_heading = desired_heading.to_msg_quat()
+
         self.__active_limelight_name = LimelightNames.Front if side == Arm_Goal.SIDE_FRONT else LimelightNames.Back
         self.__pid_controller = PIDController(kP=0.003, kD=0.0025, filter_r=0.4)
         self.__twist_pub = rospy.Publisher(name="SwerveAutoControl", data_class=Swerve_Drivetrain_Auto_Control,queue_size=10,tcp_nodelay=True)
@@ -63,6 +79,7 @@ class ConeNodeAutoAlignmentAction(Action):
         if tv:
             output = self.__pid_controller.update(0, tx)
             sdac = Swerve_Drivetrain_Auto_Control()
+            sdac.pose.orientation = self.__desired_heading
             sdac.twist.linear.y = output
             self.__twist_pub.publish(sdac)
             #adjust output by ta?
