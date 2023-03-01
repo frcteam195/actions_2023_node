@@ -25,7 +25,7 @@ class AutoBalanceAction(Action):
         self.__imu_subscriber.register_for_updates("/RobotIMU")
         self.__balance_direction = balance_direction
         self.__balance_threshold = math.radians(balance_threshold_deg)
-        self.__balance_pid = PIDController(kP = 0.05, kD=0.01)
+        self.__balance_pid = PIDController(kP = 2.1, kD=1)
         self.__drive_twist_publisher = rospy.Publisher(name="/SwerveAutoControl", data_class=Swerve_Drivetrain_Auto_Control, queue_size=10, tcp_nodelay=True)
 
 
