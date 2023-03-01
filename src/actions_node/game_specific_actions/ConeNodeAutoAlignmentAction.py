@@ -33,7 +33,7 @@ class ConeNodeAutoAlignmentAction(Action):
         self.__side = side
         self.__active_limelight_name = LimelightNames.Front if side == Arm_Goal.SIDE_FRONT else LimelightNames.Back
         self.__pid_controller = PIDController(kP=0.003, kD=0.0025, filter_r=0.4)
-        self.__twist_pub = rospy.Publisher(name="SwerveDrivetrainAutoControl", data_class=Swerve_Drivetrain_Auto_Control,queue_size=10,tcp_nodelay=True)
+        self.__twist_pub = rospy.Publisher(name="SwerveAutoControl", data_class=Swerve_Drivetrain_Auto_Control,queue_size=10,tcp_nodelay=True)
         pass
 
     def start(self):

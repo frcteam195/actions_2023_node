@@ -50,7 +50,7 @@ class AutoBalanceAction(Action):
             process_var : float = self.__determine_process_var(imu_sensor_data.orientation)
         
             control_msg : Swerve_Drivetrain_Auto_Control = Swerve_Drivetrain_Auto_Control()
-
+            control_msg.pose.orientation = imu_sensor_data.orientation.to_msg_quat()
             if self.__balance_direction == BalanceDirection.PITCH:
                 control_msg.twist.linear.x = self.__balance_pid.update(0, process_var)
                 control_msg.twist.linear.y = 0
