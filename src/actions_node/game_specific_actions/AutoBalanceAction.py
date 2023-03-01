@@ -63,7 +63,12 @@ class AutoBalanceAction(Action):
 
 
     def done(self):
-        self.__drive_twist_publisher.publish(Swerve_Drivetrain_Auto_Control())
+        imu_data : Odometry = self.__imu_subscriber.get()
+        if imu_data is not None:
+            imu_sensor_data : Pose = Pose(imu_data.pose.pose)
+            control_msg : Swerve_Drivetrain_Auto_Control = Swerve_Drivetrain_Auto_Control()
+            control_msg.pose.orientation = imu_sensor_data.orientation.to_msg_quat()
+            self.__drive_twist_publisher.publish(control_msg)
 
 
     def isFinished(self) -> bool:
