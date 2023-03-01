@@ -22,7 +22,7 @@ class AutoBalanceAction(Action):
         self.__traj_status_subscriber = BufferedROSMsgHandlerPy(Trajectory_Status)
         self.__traj_status_subscriber.register_for_updates("/TrajectoryStatus")
         self.__imu_subscriber = BufferedROSMsgHandlerPy(IMU_Data)
-        self.__imu_subscriber.register_for_updates("/IMUData")
+        self.__imu_subscriber.register_for_updates("/RobotIMU")
         self.__balance_direction = balance_direction
         self.__balance_threshold = math.radians(balance_threshold_deg)
         self.__balance_pid = PIDController(kP = 0.005, kD=0.0008)
