@@ -37,13 +37,13 @@ class ConeNodeAutoAlignmentAction(Action):
         
         desired_heading = Rotation()
         if self.__side == Arm_Goal.SIDE_FRONT and self.__alliance == Alliance.RED:
-            desired_heading.yaw = 180
+            desired_heading.yaw = math.radians(180)
         elif self.__side == Arm_Goal.SIDE_FRONT and self.__alliance == Alliance.BLUE:
-            desired_heading.yaw = 0
+            desired_heading.yaw = math.radians(0)
         elif self.__side == Arm_Goal.SIDE_BACK and self.__alliance == Alliance.RED:
-            desired_heading.yaw = 0
+            desired_heading.yaw = math.radians(0)
         elif self.__side == Arm_Goal.SIDE_BACK and self.__alliance == Alliance.BLUE:
-            desired_heading.yaw = 180
+            desired_heading.yaw = math.radians(180)
         
         self.__desired_heading = desired_heading.to_msg_quat()
 
