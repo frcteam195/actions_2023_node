@@ -51,15 +51,22 @@ class AutoBalanceAction(Action):
         
             control_msg : Swerve_Drivetrain_Auto_Control = Swerve_Drivetrain_Auto_Control()
             control_msg.pose.orientation = imu_sensor_data.orientation.to_msg_quat()
+            yaw = normalize_to_2_pi(imu_sensor_data.orientation.yaw)
+            yaw = np.degrees(yaw)
             if self.__balance_direction == BalanceDirection.PITCH:
-                control_msg.twist.linear.x = self.__balance_pid.update(0, process_var)
+                if 90 < yaw < 270:
+                    control_msg.twist.linear.x = -self.__balance_pid.update(0, process_var)
+                else:
+                    control_msg.twist.linear.x = self.__balance_pid.update(0, process_var)
                 control_msg.twist.linear.y = 0
             elif self.__balance_direction == BalanceDirection.ROLL:
                 control_msg.twist.linear.x = 0
-                control_msg.twist.linear.y = self.__balance_pid.update(0, process_var)
+                if 90 < yaw < 270:
+                    control_msg.twist.linear.y = -self.__balance_pid.update(0, process_var)
+                else:
+                    control_msg.twist.linear.y = self.__balance_pid.update(0, process_var)
 
             self.__drive_twist_publisher.publish(control_msg)
-
 
 
     def done(self):
