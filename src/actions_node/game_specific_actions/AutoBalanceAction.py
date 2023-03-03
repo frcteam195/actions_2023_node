@@ -10,9 +10,11 @@ from ck_utilities_py_node.geometry import *
 from enum import Enum
 from ck_utilities_py_node.pid_controller import PIDController
 
+
 class BalanceDirection(Enum):
     PITCH = 0
     ROLL = 1
+
 
 class RobotDirection(Enum):
     FRONT = 0
@@ -22,7 +24,7 @@ class RobotDirection(Enum):
 class AutoBalanceAction(Action):
     """An action that commands a twist to the swerve drivetrain in order to balance on the charge station"""
 
-    def __init__(self, balance_direction : BalanceDirection, balance_threshold_deg : float, desired_robot_direction : RobotDirection):
+    def __init__(self, balance_direction: BalanceDirection, balance_threshold_deg: float, desired_robot_direction: RobotDirection):
         rospy.logerr("Init auto balance action")
         self.__imu_subscriber = BufferedROSMsgHandlerPy(Odometry)
         self.__imu_subscriber.register_for_updates("/RobotIMU")
@@ -46,28 +48,27 @@ class AutoBalanceAction(Action):
         self.__desired_rotation = Rotation()
         self.__desired_rotation.yaw = self.__desired_heading
         self.__balance_threshold = math.radians(balance_threshold_deg)
-        self.__balance_pid = PIDController(kP = 2.1, kD=1, filter_r=0.6)
+        self.__balance_pid = PIDController(kP=1.6, kD=1, filter_r=0.6)
         self.__drive_twist_publisher = rospy.Publisher(name="/SwerveAutoControl", data_class=Swerve_Drivetrain_Auto_Control, queue_size=10, tcp_nodelay=True)
-
 
     def start(self):
         rospy.logerr("Starting auto balance")
         rospy.wait_for_service('/stop_trajectory')
         stop_traj = rospy.ServiceProxy('/stop_trajectory', StopTrajectory)
-        stop_traj_response : StopTrajectoryResponse = stop_traj()
-        if not stop_traj_response.accepted:
-            rospy.logerr(f"Failed to stop trajectory")
+        stop_traj_response: StopTrajectoryResponse = stop_traj()
 
+        if not stop_traj_response.accepted:
+            rospy.logerr("Failed to stop trajectory!")
 
     def update(self):
         rospy.logerr("Update auto balance")
-        imu_data : Odometry = self.__imu_subscriber.get()
+        imu_data: Odometry = self.__imu_subscriber.get()
         if imu_data is not None:
             rospy.logerr("Not none here")
-            imu_sensor_data : Pose = Pose(imu_data.pose.pose)
-            process_var : float = self.__determine_process_var(imu_sensor_data.orientation)
-        
-            control_msg : Swerve_Drivetrain_Auto_Control = Swerve_Drivetrain_Auto_Control()
+            imu_sensor_data: Pose = Pose(imu_data.pose.pose)
+            process_var: float = self.__determine_process_var(imu_sensor_data.orientation)
+
+            control_msg: Swerve_Drivetrain_Auto_Control = Swerve_Drivetrain_Auto_Control()
             rospy.logerr(f"desired rotation yaw update: {self.__desired_rotation.yaw}")
             control_msg.pose.orientation = self.__desired_rotation.to_msg_quat()
             control_msg.pose.position.x = 11
@@ -89,22 +90,20 @@ class AutoBalanceAction(Action):
             self.__drive_twist_publisher.publish(control_msg)
             rospy.logerr("Published")
 
-
     def done(self):
-        imu_data : Odometry = self.__imu_subscriber.get()
+        imu_data: Odometry = self.__imu_subscriber.get()
         rospy.logerr("Completed auto balance")
         if imu_data is not None:
-            imu_sensor_data : Pose = Pose(imu_data.pose.pose)
-            control_msg : Swerve_Drivetrain_Auto_Control = Swerve_Drivetrain_Auto_Control()
+            imu_sensor_data: Pose = Pose(imu_data.pose.pose)
+            control_msg: Swerve_Drivetrain_Auto_Control = Swerve_Drivetrain_Auto_Control()
             control_msg.pose.orientation = self.__desired_rotation.to_msg_quat()
             self.__drive_twist_publisher.publish(control_msg)
 
-
     def isFinished(self) -> bool:
-        imu_data : Odometry = self.__imu_subscriber.get()
+        imu_data: Odometry = self.__imu_subscriber.get()
         if imu_data is not None:
-            imu_sensor_data : Pose = Pose(imu_data.pose.pose)
-            process_var : float = self.__determine_process_var(imu_sensor_data.orientation)
+            imu_sensor_data: Pose = Pose(imu_data.pose.pose)
+            process_var: float = self.__determine_process_var(imu_sensor_data.orientation)
             rospy.logerr(f"is finished: {within(process_var, 0, self.__balance_threshold)}")
             rospy.logerr(f"Pitch: {imu_sensor_data.orientation.pitch}, Roll: {imu_sensor_data.orientation.roll}")
             rospy.logerr(f"process var: {process_var}")
@@ -112,13 +111,11 @@ class AutoBalanceAction(Action):
         rospy.logerr("IMU Data is none")
         return False
 
-
     def affectedSystems(self) -> List[Subsystem]:
-        return [ Subsystem.DRIVEBASE ]
-    
+        return [Subsystem.DRIVEBASE]
 
-    def __determine_process_var(self, imu_sensor_data : Rotation) -> float:
-        process_var : float = 0
+    def __determine_process_var(self, imu_sensor_data: Rotation) -> float:
+        process_var: float = 0
         if self.__balance_direction == BalanceDirection.PITCH:
             process_var = imu_sensor_data.pitch
         elif self.__balance_direction == BalanceDirection.ROLL:
