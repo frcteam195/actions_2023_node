@@ -35,7 +35,7 @@ class ActionRunner:
                     for a in self.__active_action_list:
                         if a.isFinished():
                             a.done()
-                    
+
                     self.__active_action_list[:] = list(filter(lambda a: not a.isFinished(), self.__active_action_list))
 
                 for a in self.__active_action_list:
