@@ -24,12 +24,16 @@ class RobotDirection(Enum):
 
 
 class AutoBalanceAction(Action):
-    """An action that commands a twist to the swerve drivetrain in order to balance on the charge station"""
+    """
+    An action that commands a twist to the swerve drivetrain to balance on the charge station.
+    """
 
     def __init__(self, balance_direction: BalanceDirection, balance_threshold_deg: float, desired_robot_direction: RobotDirection):
-        rospy.logerr("Init auto balance action")
+        rospy.logdebug("Init Auto-Balance Action")
+
         self.__imu_subscriber = BufferedROSMsgHandlerPy(Odometry)
         self.__imu_subscriber.register_for_updates("/RobotIMU")
+
         self.__balance_direction = balance_direction
         self.__desired_heading = 0
         self.__pitch_rate_average = MovingAverage(10)
@@ -58,57 +62,31 @@ class AutoBalanceAction(Action):
         self.__drive_twist_publisher = rospy.Publisher(name="/SwerveAutoControl", data_class=Swerve_Drivetrain_Auto_Control, queue_size=10, tcp_nodelay=True)
 
     def start(self):
-        rospy.logerr("Starting auto balance")
+        rospy.logdebug("Starting Auto-Balance Action")
         rospy.wait_for_service('/stop_trajectory')
         stop_traj = rospy.ServiceProxy('/stop_trajectory', StopTrajectory)
         stop_traj_response: StopTrajectoryResponse = stop_traj()
 
         if not stop_traj_response.accepted:
-            rospy.logerr("Failed to stop trajectory!")
+            rospy.logerr("Auto-balance failed to stop trajectory!")
 
     def update(self):
         imu_data: Odometry = self.__imu_subscriber.get()
+
         if imu_data is not None:
-            imu_sensor_data: Pose = Pose(imu_data.pose.pose)
-            process_var: float = self.__determine_process_var(imu_sensor_data.orientation)
+            current_pose: Pose = Pose(imu_data.pose.pose)
+            current_twist: Twist = Twist(imu_data.twist.twist)
 
             control_msg: Swerve_Drivetrain_Auto_Control = Swerve_Drivetrain_Auto_Control()
             control_msg.pose.orientation = self.__desired_quat
             control_msg.pose.position.x = 11
-            yaw = normalize_to_2_pi(imu_sensor_data.orientation.yaw)
-            yaw = np.degrees(yaw)
-            if self.__balance_direction == BalanceDirection.PITCH:
-                if self.__alliance == Alliance.RED:
-                    if self.__desired_robot_direction == RobotDirection.FRONT:
-                        control_msg.twist.linear.x = self.__balance_pid.update(0, process_var)
-                    else:
-                        control_msg.twist.linear.x = -self.__balance_pid.update(0, process_var)
-                elif self.__alliance == Alliance.BLUE:
-                    if self.__desired_robot_direction == RobotDirection.FRONT:
-                        control_msg.twist.linear.x = -self.__balance_pid.update(0, process_var)
-                    else:
-                        control_msg.twist.linear.x = self.__balance_pid.update(0, process_var)
-                else:
-                    rospy.logerr("No valid alliance color selected")
-                    control_msg.twist.linear.x = 0
-                control_msg.twist.linear.y = 0
-            elif self.__balance_direction == BalanceDirection.ROLL:
-                if self.__alliance == Alliance.RED:
-                    if self.__desired_robot_direction == RobotDirection.FRONT:
-                        control_msg.twist.linear.y = self.__balance_pid.update(0, process_var)
-                    else:
-                        control_msg.twist.linear.y = -self.__balance_pid.update(0, process_var)
-                elif self.__alliance == Alliance.BLUE:
-                    if self.__desired_robot_direction == RobotDirection.FRONT:
-                        control_msg.twist.linear.y = -self.__balance_pid.update(0, process_var)
-                    else:
-                        control_msg.twist.linear.y = self.__balance_pid.update(0, process_var)
-                else:
-                    rospy.logerr("No valid alliance color selected")
-                    control_msg.twist.linear.y = 0
-                control_msg.twist.linear.x = 0
-            self.__drive_twist_publisher.publish(control_msg)
 
+            yaw = normalize_to_2_pi(current_pose.orientation.yaw)
+            yaw = np.degrees(yaw)
+
+            control_msg.twist = self.__calculate_twist(current_pose, current_twist)
+
+            self.__drive_twist_publisher.publish(control_msg)
 
     def done(self):
         control_msg: Swerve_Drivetrain_Auto_Control = Swerve_Drivetrain_Auto_Control()
@@ -126,10 +104,33 @@ class AutoBalanceAction(Action):
     def affectedSystems(self) -> List[Subsystem]:
         return [Subsystem.DRIVEBASE]
 
-    def __determine_process_var(self, imu_sensor_data: Rotation) -> float:
-        process_var: float = 0
+    def __calculate_twist(self, current_pose: Pose, current_twist: Twist) -> Twist:
+        """
+        Returns a twist from the current pose.
+        """
+        twist = Twist()
+        twist.linear.x = 0.0
+        twist.linear.y = 0.0
+
+        # Return nothing if the alliance is incorrect.
+        if self.__alliance not in (Alliance.RED, Alliance.BLUE):
+            rospy.logerr("Auto-balance has no valid alliance color selected.")
+            return twist
+
+        # Determine if the twist needs to be inverted.
+        invert: float = 1.0
+        if self.__alliance == Alliance.BLUE:
+            invert *= -1.0
+        if self.__desired_robot_direction == RobotDirection.BACK:
+            invert *= -1.0
+
+        # Calculate the twist.
+        # TODO: Determine how to best combine the angular and orientation.
         if self.__balance_direction == BalanceDirection.PITCH:
-            process_var = imu_sensor_data.pitch
+            process_var = current_pose.orientation.pitch + current_twist.angular.pitch
+            twist.linear.x = invert * self.__balance_pid.update(0, process_var)
         elif self.__balance_direction == BalanceDirection.ROLL:
-            process_var = imu_sensor_data.roll
-        return process_var
+            process_var = current_pose.orientation.roll + current_twist.angular.roll
+            twist.linear.y = invert * self.__balance_pid.update(0, process_var)
+
+        return twist
