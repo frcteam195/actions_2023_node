@@ -1,24 +1,34 @@
-import rospy
-import math
-from actions_node.default_actions.Action import Action
-from typing import List
-from frc_robot_utilities_py_node.frc_robot_utilities_py import *
-from actions_node.game_specific_actions.Subsystem import Subsystem
-from swerve_trajectory_node.srv import StopTrajectory, StopTrajectoryResponse
-from ck_ros_msgs_node.msg import Trajectory_Status, Swerve_Drivetrain_Auto_Control
-from nav_msgs.msg import Odometry
-from ck_utilities_py_node.geometry import *
 from enum import Enum
+from typing import List
+
+import rospy
+
+from actions_node.default_actions.Action import Action
+from actions_node.game_specific_actions.Subsystem import Subsystem
+
+from ck_ros_msgs_node.msg import Swerve_Drivetrain_Auto_Control
+from nav_msgs.msg import Odometry
+from swerve_trajectory_node.srv import StopTrajectory, StopTrajectoryResponse
+
+from ck_utilities_py_node.geometry import *
 from ck_utilities_py_node.pid_controller import PIDController
 from ck_utilities_py_node.moving_average import MovingAverage
 
+from frc_robot_utilities_py_node.frc_robot_utilities_py import *
+
 
 class BalanceDirection(Enum):
+    """
+    The lateral direction for balancing.
+    """
     PITCH = 0
     ROLL = 1
 
 
 class RobotDirection(Enum):
+    """
+    Direction the robot is driving towards the charge station.
+    """
     FRONT = 0
     BACK = 1
 
@@ -74,17 +84,20 @@ class AutoBalanceAction(Action):
         imu_data: Odometry = self.__imu_subscriber.get()
 
         if imu_data is not None:
-            current_pose: Pose = Pose(imu_data.pose.pose)
             current_twist: Twist = Twist(imu_data.twist.twist)
 
             control_msg: Swerve_Drivetrain_Auto_Control = Swerve_Drivetrain_Auto_Control()
             control_msg.pose.orientation = self.__desired_quat
             control_msg.pose.position.x = 11
 
-            yaw = normalize_to_2_pi(current_pose.orientation.yaw)
-            yaw = np.degrees(yaw)
+            self.__pitch_rate_average.add_sample(current_twist.angular.pitch)
 
-            control_msg.twist = self.__calculate_twist(current_pose, current_twist)
+            if self.__pitch_rate_average.get_average() > np.radians(12.0):
+                back_twist = Twist()
+                back_twist.linear.x = -0.5
+                control_msg.twist = back_twist.to_msg()
+            else:
+                control_msg.twist = self.__calculate_twist().to_msg()
 
             self.__drive_twist_publisher.publish(control_msg)
 
@@ -93,18 +106,17 @@ class AutoBalanceAction(Action):
         control_msg.pose.orientation = self.__desired_quat
         self.__drive_twist_publisher.publish(control_msg)
 
-    def isFinished(self) -> bool:
-        imu_data: Odometry = self.__imu_subscriber.get()
-        if imu_data is not None:
-            angular_rates = Twist(imu_data.twist.twist).angular
-            self.__pitch_rate_average.add_sample(angular_rates.pitch)
-            return abs(self.__pitch_rate_average.get_average()) > math.radians(12.0)
+    def isFinished(self) -> bool:   
+        # imu_data: Odometry = self.__imu_subscriber.get()
+        # if imu_data is not None:
+        #     angular_rates = Twist(imu_data.twist.twist).angular
+        #     return abs(self.__pitch_rate_average.get_average()) > math.radians(12.0)
         return False
 
     def affectedSystems(self) -> List[Subsystem]:
         return [Subsystem.DRIVEBASE]
 
-    def __calculate_twist(self, current_pose: Pose, current_twist: Twist) -> Twist:
+    def __calculate_twist(self) -> Twist:
         """
         Returns a twist from the current pose.
         """
@@ -125,12 +137,9 @@ class AutoBalanceAction(Action):
             invert *= -1.0
 
         # Calculate the twist.
-        # TODO: Determine how to best combine the angular and orientation.
         if self.__balance_direction == BalanceDirection.PITCH:
-            process_var = current_pose.orientation.pitch + current_twist.angular.pitch
-            twist.linear.x = invert * self.__balance_pid.update(0, process_var)
+            twist.linear.x = invert * 0.5
         elif self.__balance_direction == BalanceDirection.ROLL:
-            process_var = current_pose.orientation.roll + current_twist.angular.roll
-            twist.linear.y = invert * self.__balance_pid.update(0, process_var)
+            twist.linear.y = invert * 0.5
 
         return twist
