@@ -32,6 +32,11 @@ class RobotDirection(Enum):
     FRONT = 0
     BACK = 1
 
+class AutoBalanceState(Enum):
+    InitialDrive = 0,
+    Backup = 1,
+    Done = 2
+
 
 class AutoBalanceAction(Action):
     """
@@ -50,6 +55,8 @@ class AutoBalanceAction(Action):
         alliance = robot_status.get_alliance()
         self.__alliance = alliance
         self.__desired_robot_direction = desired_robot_direction
+        self.__current_state = AutoBalanceState.InitialDrive
+        self.__initial_backup_pos = 0
         if alliance == Alliance.RED:
             if desired_robot_direction == RobotDirection.FRONT:
                 self.__desired_heading = 0
@@ -84,6 +91,7 @@ class AutoBalanceAction(Action):
         imu_data: Odometry = self.__imu_subscriber.get()
 
         if imu_data is not None:
+            current_pose : Pose = Pose(imu_data.pose.pose)
             current_twist: Twist = Twist(imu_data.twist.twist)
 
             control_msg: Swerve_Drivetrain_Auto_Control = Swerve_Drivetrain_Auto_Control()
@@ -92,12 +100,17 @@ class AutoBalanceAction(Action):
 
             self.__pitch_rate_average.add_sample(current_twist.angular.pitch)
 
-            if self.__pitch_rate_average.get_average() > np.radians(12.0):
-                back_twist = Twist()
-                back_twist.linear.x = -0.5
-                control_msg.twist = back_twist.to_msg()
-            else:
-                control_msg.twist = self.__calculate_twist().to_msg()
+            if self.__current_state == AutoBalanceState.InitialDrive:
+                control_msg.twist = self.__calculate_twist(False).to_msg()
+                if self.__pitch_rate_average.get_average() > np.radians(12.0):
+                    self.__initial_backup_pos = current_pose.position.x
+                    self.__current_state = AutoBalanceState.Backup
+            elif self.__current_state == AutoBalanceState.Backup:
+                control_msg.twist = self.__calculate_twist(True).to_msg()
+                driven_distance = abs(abs(current_pose.position.x) - abs(self.__initial_backup_pos))
+                if driven_distance >= inches_to_meters(6):
+                    self.__current_state = AutoBalanceState.Done
+
 
             self.__drive_twist_publisher.publish(control_msg)
 
@@ -105,18 +118,16 @@ class AutoBalanceAction(Action):
         control_msg: Swerve_Drivetrain_Auto_Control = Swerve_Drivetrain_Auto_Control()
         control_msg.pose.orientation = self.__desired_quat
         self.__drive_twist_publisher.publish(control_msg)
+        
 
     def isFinished(self) -> bool:   
-        # imu_data: Odometry = self.__imu_subscriber.get()
-        # if imu_data is not None:
-        #     angular_rates = Twist(imu_data.twist.twist).angular
-        #     return abs(self.__pitch_rate_average.get_average()) > math.radians(12.0)
-        return False
-
+        return self.__current_state == AutoBalanceState.Done
+    
+    
     def affectedSystems(self) -> List[Subsystem]:
         return [Subsystem.DRIVEBASE]
 
-    def __calculate_twist(self) -> Twist:
+    def __calculate_twist(self, inverted : bool = False) -> Twist:
         """
         Returns a twist from the current pose.
         """
@@ -134,6 +145,9 @@ class AutoBalanceAction(Action):
         if self.__alliance == Alliance.BLUE:
             invert *= -1.0
         if self.__desired_robot_direction == RobotDirection.BACK:
+            invert *= -1.0
+
+        if inverted:
             invert *= -1.0
 
         # Calculate the twist.
