@@ -47,7 +47,7 @@ class StopIntakeAction(Action):
         if self.intake_subsystem.get() is None:
             rospy.logerr("No status update present from intake")
             return False
-        
+
         duration = datetime.now() - self.__start_time
         return duration.total_seconds() > constant.INTAKE_ACTUATION_TIME
 

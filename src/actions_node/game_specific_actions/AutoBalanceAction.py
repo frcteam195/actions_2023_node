@@ -117,14 +117,14 @@ class AutoBalanceAction(Action):
 
             if self.__current_state == AutoBalanceState.InitialDrive:
                 control_msg.twist = self.__calculate_twist(False).to_msg()
-                if self.__pitch_rate_average.get_average() > np.radians(12.0):
+                if self.__pitch_rate_average.get_average() > np.radians(self.__balance_threshold) and self.__current_pose.orientation.pitch < 10.0:
                     self.__initial_backup_pos = self.__current_pose.position.x if self.__balance_direction == BalanceDirection.PITCH else self.__current_pose.position.y
                     self.__current_state = AutoBalanceState.Backup
             elif self.__current_state == AutoBalanceState.Backup:
                 control_msg.twist = self.__calculate_twist(True).to_msg()
                 driven_distance = self.__calaculate_distance_travelled()
                 rospy.logerr(f"Distance Driven: {driven_distance}")
-                if driven_distance >= inches_to_meters(6):
+                if driven_distance >= inches_to_meters(8):
                     self.__current_state = AutoBalanceState.Done
 
             self.__drive_twist_publisher.publish(control_msg)
@@ -164,9 +164,9 @@ class AutoBalanceAction(Action):
 
         # Calculate the twist.
         if self.__balance_direction == BalanceDirection.PITCH:
-            twist.linear.x = -invert * 0.5
+            twist.linear.x = -invert * 1.0
         elif self.__balance_direction == BalanceDirection.ROLL:
-            twist.linear.y = -invert * 0.5
+            twist.linear.y = -invert * 1.0
 
         return twist
 
