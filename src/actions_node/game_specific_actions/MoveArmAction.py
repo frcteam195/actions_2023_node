@@ -15,8 +15,8 @@ class MoveArmAction(Action):
         self.__Arm_Goal_msg.goal = arm_goal
         self.__Arm_Goal_msg.goal_side = arm_goal_side
         self.__Arm_Goal_msg.wrist_goal = wrist_goal
-        self.__base_deviation_tolerance_deg = abs(base_deviation_tolerance_deg)
-        self.__upper_deviation_tolerance_deg = abs(upper_deviation_tolerance_deg)
+        self.__base_deviation_tolerance_deg = base_deviation_tolerance_deg
+        self.__upper_deviation_tolerance_deg = upper_deviation_tolerance_deg
 
     #Do not call these methods directly
     def start(self):
