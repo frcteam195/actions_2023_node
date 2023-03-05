@@ -46,7 +46,7 @@ class AutoBalanceAction(Action):
     An action that commands a twist to the swerve drivetrain to balance on the charge station.
     """
 
-    def __init__(self, balance_direction: BalanceDirection, balance_threshold_deg: float, desired_robot_direction: RobotDirection):
+    def __init__(self, balance_direction: BalanceDirection):
         rospy.logdebug("Init Auto-Balance Action")
 
         self.__imu_subscriber = BufferedROSMsgHandlerPy(Odometry)
@@ -60,30 +60,11 @@ class AutoBalanceAction(Action):
         self.__pitch_rate_average = MovingAverage(10)
         alliance = robot_status.get_alliance()
         self.__alliance = alliance
-        self.__desired_robot_direction = desired_robot_direction
-        self.__current_state = AutoBalanceState.InitialDrive
-        self.__initial_backup_pos = 0
-        if alliance == Alliance.RED:
-            if desired_robot_direction == RobotDirection.FRONT:
-                self.__desired_heading = 0
-            else:
-                self.__desired_heading = math.pi
-        elif alliance == Alliance.BLUE:
-            if desired_robot_direction == RobotDirection.FRONT:
-                self.__desired_heading = math.pi
-            else:
-                self.__desired_heading = 0
-        else:
-            rospy.logerr("No valid alliance color selected")
-            self.__desired_heading = 0
-        rospy.logerr(self.__desired_heading)
+
         self.__desired_rotation = Rotation()
         self.__desired_rotation.yaw = self.__desired_heading
         self.__desired_quat = self.__desired_rotation.to_msg_quat()
-        self.__balance_threshold = math.radians(balance_threshold_deg)
-        self.__balance_pid = PIDController(kP=1.4, kD=0.6, filter_r=0.6)
         self.__drive_twist_publisher = rospy.Publisher(name="/SwerveAutoControl", data_class=Swerve_Drivetrain_Auto_Control, queue_size=10, tcp_nodelay=True)
-        self.__current_pose = Pose()
         self.__start_time = 0
         self.__level_time = 0
         self.__imu_pose = Pose()
@@ -117,25 +98,44 @@ class AutoBalanceAction(Action):
             control_msg.pose.orientation = self.__desired_quat
             control_msg.pose.position.x = 11
 
-            self.__pitch_rate_average.add_sample(current_twist.angular.pitch)
-            rospy.logerr(f"Pitch: {degrees(self.__imu_pose.orientation.pitch)} Roll: {degrees(self.__imu_pose.orientation.roll)} PitchRate: {current_twist.angular.pitch}")
+            if self.__balance_direction == BalanceDirection.PITCH:
+                rospy.logerr(f"Pitch: {degrees(self.__imu_pose.orientation.pitch)} Roll: {degrees(self.__imu_pose.orientation.roll)} PitchRate: {current_twist.angular.pitch}")
 
-            control_msg.twist = self.__calculate_twist(False).to_msg()
+                control_msg.twist = self.__calculate_twist(False).to_msg()
 
-            max_pitch_error = 0.35
+                max_pitch_error = 0.60
 
 
-            sign = np.sign(self.__imu_pose.orientation.pitch)
-            pitch_error = degrees(self.__imu_pose.orientation.pitch)
-            pitch_error = pitch_error * pitch_error
-            pitch_error = pitch_error * 0.0035 * sign
+                sign = np.sign(self.__imu_pose.orientation.pitch)
+                pitch_error = degrees(self.__imu_pose.orientation.pitch)
+                pitch_error = pitch_error * pitch_error
+                pitch_error = pitch_error * 0.0060 * sign
 
-            pitch_error = limit(pitch_error, -max_pitch_error, max_pitch_error)
+                pitch_error = limit(pitch_error, -max_pitch_error, max_pitch_error)
 
-            control_msg.twist.linear.x = control_msg.twist.linear.x * pitch_error
-            control_msg.twist.linear.y = control_msg.twist.linear.y * pitch_error
+                control_msg.twist.linear.x = control_msg.twist.linear.x * pitch_error
+                control_msg.twist.linear.y = control_msg.twist.linear.y * pitch_error
 
-            if abs(current_twist.angular.pitch) > 0.23:
+            else:
+                rospy.logerr(f"Pitch: {degrees(self.__imu_pose.orientation.pitch)} Roll: {degrees(self.__imu_pose.orientation.roll)} PitchRate: {current_twist.angular.pitch}")
+
+                control_msg.twist = self.__calculate_twist(False).to_msg()
+
+                max_roll_error = 0.60
+
+
+                sign = np.sign(self.__imu_pose.orientation.roll)
+                roll_error = degrees(self.__imu_pose.orientation.roll)
+                roll_error = roll_error * roll_error
+                roll_error = roll_error * 0.0060 * sign
+
+                roll_error = limit(roll_error, -max_roll_error, max_roll_error)
+
+                control_msg.twist.linear.x = control_msg.twist.linear.x * roll_error
+                control_msg.twist.linear.y = control_msg.twist.linear.y * roll_error
+
+
+            if abs(current_twist.angular.pitch) > 0.15 or abs(current_twist.angular.roll) > 0.15:
                 control_msg.twist.linear.x = 0
                 control_msg.twist.linear.y = 0
 
@@ -177,8 +177,6 @@ class AutoBalanceAction(Action):
         invert: float = 1.0
         if self.__alliance == Alliance.BLUE:
             invert *= -1.0
-        if self.__desired_robot_direction == RobotDirection.BACK:
-            invert *= -1.0
         if inverted:
             invert *= -1.0
 
@@ -189,11 +187,3 @@ class AutoBalanceAction(Action):
             twist.linear.y = -invert * 1.0
 
         return twist
-
-    def __calaculate_distance_travelled(self) -> float:
-        distance_travelled = 0.0
-        if self.__balance_direction == BalanceDirection.PITCH:
-            distance_travelled = abs(self.__current_pose.position.x - self.__initial_backup_pos)
-        elif self.__balance_direction == BalanceDirection.ROLL:
-            distance_travelled = abs(self.__current_pose.position.y - self.__initial_backup_pos)
-        return distance_travelled
