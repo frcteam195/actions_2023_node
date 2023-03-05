@@ -13,6 +13,8 @@ from swerve_trajectory_node.srv import StopTrajectory, StopTrajectoryResponse
 from ck_utilities_py_node.geometry import *
 from ck_utilities_py_node.pid_controller import PIDController
 from ck_utilities_py_node.moving_average import MovingAverage
+from ck_utilities_py_node.ckmath import limit
+from math import degrees, radians
 
 from frc_robot_utilities_py_node.frc_robot_utilities_py import *
 
@@ -82,6 +84,9 @@ class AutoBalanceAction(Action):
         self.__balance_pid = PIDController(kP=1.4, kD=0.6, filter_r=0.6)
         self.__drive_twist_publisher = rospy.Publisher(name="/SwerveAutoControl", data_class=Swerve_Drivetrain_Auto_Control, queue_size=10, tcp_nodelay=True)
         self.__current_pose = Pose()
+        self.__start_time = 0
+        self.__level_time = 0
+        self.__imu_pose = Pose()
 
     def start(self):
         rospy.logdebug("Starting Auto-Balance Action")
@@ -89,6 +94,8 @@ class AutoBalanceAction(Action):
         rospy.wait_for_service('/stop_trajectory')
         stop_traj = rospy.ServiceProxy('/stop_trajectory', StopTrajectory)
         stop_traj_response: StopTrajectoryResponse = stop_traj()
+
+        self.__start_time = rospy.Time.now().to_sec()
 
         if not stop_traj_response.accepted:
             rospy.logerr("Auto-balance failed to stop trajectory!")
@@ -104,28 +111,33 @@ class AutoBalanceAction(Action):
 
         if imu_data is not None:
             current_twist: Twist = Twist(imu_data.twist.twist)
+            self.__imu_pose: Pose = Pose(imu_data.pose.pose)
 
             control_msg: Swerve_Drivetrain_Auto_Control = Swerve_Drivetrain_Auto_Control()
             control_msg.pose.orientation = self.__desired_quat
             control_msg.pose.position.x = 11
 
             self.__pitch_rate_average.add_sample(current_twist.angular.pitch)
+            rospy.logerr(f"Pitch: {degrees(self.__imu_pose.orientation.pitch)} Roll: {degrees(self.__imu_pose.orientation.roll)} PitchRate: {current_twist.angular.pitch}")
 
-            rospy.logerr(f"Current State: {self.__current_state}")
-            rospy.logerr(self.__pitch_rate_average.get_average())
-            rospy.logerr(self.__current_pose)
+            control_msg.twist = self.__calculate_twist(False).to_msg()
 
-            if self.__current_state == AutoBalanceState.InitialDrive:
-                control_msg.twist = self.__calculate_twist(False).to_msg()
-                if self.__pitch_rate_average.get_average() > np.radians(self.__balance_threshold) and self.__current_pose.orientation.pitch < 10.0:
-                    self.__initial_backup_pos = self.__current_pose.position.x if self.__balance_direction == BalanceDirection.PITCH else self.__current_pose.position.y
-                    self.__current_state = AutoBalanceState.Backup
-            elif self.__current_state == AutoBalanceState.Backup:
-                control_msg.twist = self.__calculate_twist(True).to_msg()
-                driven_distance = self.__calaculate_distance_travelled()
-                rospy.logerr(f"Distance Driven: {driven_distance}")
-                if driven_distance >= inches_to_meters(8):
-                    self.__current_state = AutoBalanceState.Done
+            max_pitch_error = 0.35
+
+
+            sign = np.sign(self.__imu_pose.orientation.pitch)
+            pitch_error = degrees(self.__imu_pose.orientation.pitch)
+            pitch_error = pitch_error * pitch_error
+            pitch_error = pitch_error * 0.0035 * sign
+
+            pitch_error = limit(pitch_error, -max_pitch_error, max_pitch_error)
+
+            control_msg.twist.linear.x = control_msg.twist.linear.x * pitch_error
+            control_msg.twist.linear.y = control_msg.twist.linear.y * pitch_error
+
+            if abs(current_twist.angular.pitch) > 0.23:
+                control_msg.twist.linear.x = 0
+                control_msg.twist.linear.y = 0
 
             self.__drive_twist_publisher.publish(control_msg)
 
@@ -135,7 +147,15 @@ class AutoBalanceAction(Action):
         self.__drive_twist_publisher.publish(control_msg)
 
     def isFinished(self) -> bool:
-        return self.__current_state == AutoBalanceState.Done
+        offset = abs(self.__imu_pose.orientation.pitch) + abs(self.__imu_pose.orientation.roll)
+        offset = degrees(offset)
+        if offset < 5:
+            self.__level_time = rospy.Time.now().to_sec()
+            rospy.logerr(f"Level atm: {offset}")
+        else:
+            self.__start_time = rospy.Time.now().to_sec()
+            rospy.logerr(f"Resetting the counter: {offset}")
+        return self.__level_time > self.__start_time + 1
 
     def affectedSystems(self) -> List[Subsystem]:
         return [Subsystem.DRIVEBASE]
