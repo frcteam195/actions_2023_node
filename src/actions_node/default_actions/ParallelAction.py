@@ -8,6 +8,7 @@ class ParallelAction(Action):
     def __init__(self, action_list:List[Action]):
         self.__action_list:List[Action] = action_list
 
+# TODO: Nest printing of actions one after the other through some way
         for a in self.__action_list[:]:
             if a is None:
                 rospy.logerr("Invalid action added to list")
@@ -22,18 +23,24 @@ class ParallelAction(Action):
             a.update()
 
     def done(self):
-        for a in self.__action_list:
-            a.done()
+        pass
 
     def isFinished(self) -> bool:
-        for a in self.__action_list:
+        retval = True
+        for a in self.__action_list[:]:
             if not a.isFinished():
-                return False
+                retval &= False
+            else:
+                a.done()
+                self.__action_list.remove(a)
 
-        return True
+        return retval
 
     def affectedSystems(self) -> List[Subsystem]:
         retlist = []
         for a in self.__action_list:
             retlist.extend(a.affectedSystems())
         return retlist
+    
+    def __str__(self) -> str:
+        return f"Parallel: {', '.join(str(a) for a in self.__action_list)}"

@@ -47,3 +47,6 @@ class SeriesAction(Action):
         for a in self.__action_list:
             retlist.extend(a.affectedSystems())
         return retlist
+    
+    def __str__(self) -> str:
+        return f"Series: {str(self.__current_action)}"

@@ -25,3 +25,6 @@ class Action(ABC):
     @abstractmethod
     def affectedSystems(self) -> List[Subsystem]:
         pass 
+
+    def __str__(self) -> str:
+        return self.__class__.__name__
