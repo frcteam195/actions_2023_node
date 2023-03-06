@@ -32,8 +32,8 @@ class ActionRunner:
         if robot_mode != RobotMode.DISABLED:
             if num_actions > 0:
                 ############DEBUG
-                # for a in self.__active_action_list:
-                #     rospy.logerr(f"Active Action {a.__orig_class__.__args__[0]}")
+                for a in self.__active_action_list:
+                    rospy.logdebug_throttle(5, f"Active Action {a.__orig_class__.__args__[0]}")
                 #################
 
                 if any(a.isFinished() for a in self.__active_action_list):
