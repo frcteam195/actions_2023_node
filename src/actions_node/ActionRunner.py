@@ -33,12 +33,15 @@ class ActionRunner:
             if num_actions > 0:
                 ############DEBUG
                 for a in self.__active_action_list:
-                    rospy.loginfo_throttle_identical(0.5, f"Active Action {a.__class__.__name__}")
+                    rospy.loginfo_throttle_identical(0.5, f"Active Action: {a.__class__.__name__}")
                 #################
 
                 if any(a.isFinished() for a in self.__active_action_list):
                     for a in self.__active_action_list:
                         if a.isFinished():
+                            ############DEBUG
+                            rospy.loginfo_throttle_identical(0.5, f"Finished Action: {a.__class__.__name__}")
+                            #################
                             a.done()
 
                     self.__active_action_list[:] = list(filter(lambda a: not a.isFinished(), self.__active_action_list))
