@@ -16,6 +16,9 @@ class ActionRunner:
             for s in a.affectedSystems():
                 b.append(s)
         return b
+    
+    def reset_action_list(self):
+        self.__active_action_list:List[Action] = []
 
 
     def start_action(self, new_action:Action):
