@@ -33,7 +33,7 @@ class ActionRunner:
             if num_actions > 0:
                 ############DEBUG
                 for a in self.__active_action_list:
-                    rospy.logdebug_throttle(5, f"Active Action {a.__orig_class__.__args__[0]}")
+                    rospy.loginfo_throttle_identical(0.5, f"Active Action {a.__class__.__name__}")
                 #################
 
                 if any(a.isFinished() for a in self.__active_action_list):
