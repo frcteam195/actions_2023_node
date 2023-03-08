@@ -53,7 +53,7 @@ class AutoBalanceAction(Action):
         self.__imu_subscriber.register_for_updates("/RobotIMU")
 
         self.__balance_direction = balance_direction
-        self.__desired_heading = desired_heading
+        self.__desired_heading = radians(desired_heading)
         self.__attitude_rate_moving_average = MovingAverage(3)
         alliance = robot_status.get_alliance()
         self.__alliance = alliance
