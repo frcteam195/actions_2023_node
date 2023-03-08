@@ -15,7 +15,7 @@ class LaunchAction(Action):
 
     intake_subsystem = SubsystemController[Intake_Control, Intake_Status]('IntakeControl', Intake_Control, 'IntakeStatus', Intake_Status)
 
-    def __init__(self, pinched : bool, time_to_outtake_s : float = -1, launch_speed: float = 1):
+    def __init__(self, pinched : bool, launch_speed: float = 1, time_to_outtake_s : float = -1):
         """
         Parameters
         ----------
@@ -56,12 +56,11 @@ class LaunchAction(Action):
         if self.intake_subsystem.get() is None:
             rospy.logerr("No status update present from intake")
             return False
-        
+
         duration = datetime.now() - self.__start_time
         if self.__time_to_outtake_s >= 0:
-            return duration.total_seconds() > constant.INTAKE_ACTUATION_TIME + self.__time_to_outtake_s
-        else:
-            return duration.total_seconds() > constant.INTAKE_ACTUATION_TIME
+            return duration.total_seconds() > self.__time_to_outtake_s
+        return True
 
     #Do not call these methods directly
     def affectedSystems(self) -> List[Subsystem]:

@@ -125,14 +125,9 @@ class AutoBalanceAction(Action):
             control_msg.twist.linear.x = control_msg.twist.linear.x * output
             control_msg.twist.linear.y = control_msg.twist.linear.y * output
 
-            if abs(attitude_rate) > 0.30:
+            if abs(attitude_rate) > 0.28:
                 self.__tipped += 1
-                if self.__balance_direction == BalanceDirection.PITCH:
-                    control_msg.twist.linear.x = 0.0
-                    control_msg.twist.linear.y = 0.2
-                elif self.__balance_direction == BalanceDirection.ROLL:
-                    control_msg.twist.linear.x = 0.2
-                    control_msg.twist.linear.y = 0.0
+                control_msg.x_mode = True
             else:
                 self.__tipped = 0
 
@@ -141,8 +136,7 @@ class AutoBalanceAction(Action):
     def done(self):
         control_msg: Swerve_Drivetrain_Auto_Control = Swerve_Drivetrain_Auto_Control()
         control_msg.pose.orientation = self.__desired_quat
-        control_msg.twist.linear.x = 0.0
-        control_msg.twist.linear.y = 0.0
+        control_msg.x_mode = True
         self.__drive_twist_publisher.publish(control_msg)
 
     def isFinished(self) -> bool:

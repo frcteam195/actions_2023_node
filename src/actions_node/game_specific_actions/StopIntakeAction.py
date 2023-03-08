@@ -15,18 +15,21 @@ class StopIntakeAction(Action):
 
     intake_subsystem = SubsystemController[Intake_Control, Intake_Status]('IntakeControl', Intake_Control, 'IntakeStatus', Intake_Status)
 
-    def __init__(self, pinched : bool):
+    def __init__(self, pinched : bool, time_to_stop_s : float = -1):
         """
         Parameters
         ----------
         pinched : bool
             If True, the intake is pinched closed. If False, the intake is opened
+        time_to_stop_s : float
+            An optional parameter of how long to stay in the stop intake action.
+            Not specifying this parameter will immediately return true from this action.
         """
-
         self.__Intake_Control_msg = Intake_Control()
         self.__Intake_Control_msg.rollers_intake = False
         self.__Intake_Control_msg.rollers_outtake = False
         self.__Intake_Control_msg.pinched = pinched
+        self.__time_to_stop_s = time_to_stop_s
         self.__start_time = datetime.now()
 
     #Do not call these methods directly
@@ -49,7 +52,9 @@ class StopIntakeAction(Action):
             return False
 
         duration = datetime.now() - self.__start_time
-        return duration.total_seconds() > constant.INTAKE_ACTUATION_TIME
+        if self.__time_to_stop_s >= 0:
+            return duration.total_seconds() > self.__time_to_stop_s
+        return True
 
     #Do not call these methods directly
     def affectedSystems(self) -> List[Subsystem]:
