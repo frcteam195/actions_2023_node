@@ -15,7 +15,7 @@ class LaunchAction(Action):
 
     intake_subsystem = SubsystemController[Intake_Control, Intake_Status]('IntakeControl', Intake_Control, 'IntakeStatus', Intake_Status)
 
-    def __init__(self, pinched : bool, time_to_outtake_s : float = -1):
+    def __init__(self, pinched : bool, time_to_outtake_s : float = -1, launch_speed: float = 1):
         """
         Parameters
         ----------
@@ -31,7 +31,7 @@ class LaunchAction(Action):
         self.__Intake_Control_msg.rollers_intake = False
         self.__Intake_Control_msg.rollers_outtake = True
         self.__Intake_Control_msg.pinched = pinched
-        self.__Intake_Control_msg.speed = 1
+        self.__Intake_Control_msg.speed = launch_speed
         self.__time_to_outtake_s = time_to_outtake_s
         self.__start_time = datetime.now()
 
