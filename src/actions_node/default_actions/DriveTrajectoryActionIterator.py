@@ -6,7 +6,6 @@ from ck_utilities_py_node.geometry import *
 class DriveTrajectoryActionIterator():
     def __init__(self, autonomous_name : str, expected_trajectory_count : int) -> None:
         self.__trajectory_count = 0
-        self.__auto_start_pose : Pose = None
         self.__autonomous_name = autonomous_name
         self.__trajectory_index_iterator = 0
     
@@ -18,10 +17,6 @@ class DriveTrajectoryActionIterator():
 
             if auto_info_response is not None:
                 self.__trajectory_count = auto_info_response.number_of_trajectories
-                self.__auto_start_pose = Pose()
-                self.__auto_start_pose.position.x = auto_info_response.x_inches
-                self.__auto_start_pose.position.y = auto_info_response.y_inches
-                self.__auto_start_pose.orientation.yaw = auto_info_response.heading_degrees
 
             if self.__expected_trajectory_count != self.__trajectory_count:
                 rospy.logerr(f"Expected trajectory count for {self.__autonomous_name} is not correct. Expecting {self.__expected_trajectory_count} but got {self.__trajectory_count}")
