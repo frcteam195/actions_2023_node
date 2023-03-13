@@ -10,7 +10,7 @@ class ResetPoseAction(Action):
         self.__auto_start_pose : Pose = None
         self.__autonomous_name = autonomous_name
         self.__reset_pose_successful = False
-    
+
         rospy.wait_for_service('/get_autonomous_info')
         get_auto_info = rospy.ServiceProxy('/get_autonomous_info', GetAutonomousInfo)
         try:
@@ -38,7 +38,6 @@ class ResetPoseAction(Action):
             if not reset_pose_response.completed:
                 rospy.logerr(f"Failed to reset pose for {self.__autonomous_name}!")
             self.__reset_pose_successful = reset_pose_response.completed
-            
 
     def update(self):
         pass

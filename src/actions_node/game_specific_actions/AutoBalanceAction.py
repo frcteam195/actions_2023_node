@@ -109,8 +109,8 @@ class AutoBalanceAction(Action):
                 attitude = self.__imu_pose.orientation.roll
                 attitude_rate = self.__imu_twist.angular.roll
 
-            # rospy.logerr(f"Pitch: {degrees(self.__imu_pose.orientation.pitch)} Roll: {degrees(self.__imu_pose.orientation.roll)}")
-            # rospy.logerr(f"PitchRate: {degrees(self.__imu_twist.angular.pitch)},  RollRate: {degrees(self.__imu_twist.angular.roll)}")
+            rospy.loginfo(f"Pitch: {degrees(self.__imu_pose.orientation.pitch)} Roll: {degrees(self.__imu_pose.orientation.roll)}")
+            rospy.loginfo(f"PitchRate: {degrees(self.__imu_twist.angular.pitch)},  RollRate: {degrees(self.__imu_twist.angular.roll)}")
 
             # self.__attitude_rate_moving_average.add_sample(limit(abs(attitude_rate) - 0.1, 0.0, 2.0))
 
