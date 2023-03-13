@@ -169,9 +169,7 @@ class AutoBalanceAction(Action):
             return twist
 
         # Determine if the twist needs to be inverted.
-        invert: float = 1.0
-        if self.__alliance == Alliance.BLUE:
-            invert *= -1.0
+        invert: float = -1.0
         if inverted:
             invert *= -1.0
 
