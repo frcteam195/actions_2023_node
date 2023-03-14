@@ -28,7 +28,8 @@ def ScoreConeHigh(side: int, wrist_goal: int = 0) -> Action:
     """
     return SeriesAction([
         MoveArmAction(Arm_Goal.HIGH_CONE, side, wrist_goal),
-        StopIntakeAction(False)
+        WaitAction(0.30),
+        StopIntakeAction(False, 0.20)
     ])
 
 def ScoreCubeMiddle(side: int) -> Action:
@@ -60,4 +61,14 @@ def IntakeConeGround(side: int) -> Action:
             IntakeAction(True, 0)
         ]),
         IntakeAction(True, 0.5)
+    ])
+
+def IntakeDeadCone(side: int, wrist: int) -> Action:
+    """
+    Intakes a dead cone.
+    """
+    return SeriesAction([
+        MoveArmAction(Arm_Goal.GROUND_DEAD_CONE, side, wrist),
+        IntakeAction(False, 0.30),
+        IntakeAction(True, 0.40)
     ])
