@@ -28,7 +28,7 @@ def ScoreConeHigh(side: int, wrist_goal: int = 0) -> Action:
     """
     return SeriesAction([
         MoveArmAction(Arm_Goal.HIGH_CONE, side, wrist_goal),
-        WaitAction(0.30),
+        WaitAction(0.75),
         StopIntakeAction(False, 0.20)
     ])
 
