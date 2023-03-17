@@ -15,7 +15,7 @@ class IntakeAction(Action):
 
     intake_subsystem = SubsystemController[Intake_Control, Intake_Status]('IntakeControl', Intake_Control, 'IntakeStatus', Intake_Status)
 
-    def __init__(self, pinched : bool, time_to_intake_s : float = -1):
+    def __init__(self, pinched : bool, time_to_intake_s : float = -1, speed : float = 0):
         """
         Parameters
         ----------
@@ -26,11 +26,12 @@ class IntakeAction(Action):
             Not specifying this parameter will just turn the intake on without stopping it at the end of the action.
             (You would need to run a StopIntakeAction)
         """
-        
+
         self.__Intake_Control_msg = Intake_Control()
         self.__Intake_Control_msg.rollers_intake = True
         self.__Intake_Control_msg.rollers_outtake = False
         self.__Intake_Control_msg.pinched = pinched
+        self.__Intake_Control_msg.speed = speed
         self.__time_to_intake_s = time_to_intake_s
         self.__start_time = datetime.now()
 
@@ -55,7 +56,7 @@ class IntakeAction(Action):
         if self.intake_subsystem.get() is None:
             rospy.logerr("No status update present from intake")
             return False
-        
+
         duration = datetime.now() - self.__start_time
         if self.__time_to_intake_s >= 0:
             return duration.total_seconds() > self.__time_to_intake_s
