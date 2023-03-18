@@ -71,5 +71,6 @@ def IntakeDeadCone(side: int, wrist: int) -> Action:
         IntakeAction(False),
         MoveArmAction(Arm_Goal.GROUND_DEAD_CONE, side, wrist),
         WaitAction(0.15),
-        IntakeAction(True, 0.35)
+        IntakeAction(True),
+        WaitAction(0.35)
     ])
