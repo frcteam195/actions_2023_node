@@ -2,7 +2,6 @@ from enum import Enum
 
 ARM_POSITION_DELTA_THRESHOLD = 0.05
 WRIST_POSITION_DELTA_THRESHOLD = 0.05
-INTAKE_ACTUATION_TIME = 0.15
 ARM_EXTENSION_ACTUATION_TIME = 0.25
 
 class ArmPosition(int, Enum):
@@ -33,7 +32,15 @@ class WristPosition(float, Enum):
     Left_180 = 0.5,
     ##########################
 
-
+class RollerState(int, Enum):
+    """
+    State enumeration for the intake rollers.
+    """
+    Off = 0
+    Intake_Cone = 1
+    Intake_Cube = 2
+    Outtake_Cone = 3
+    Outtake_Cube = 4
 
 ArmUpperJointForwardPositions = {
     ArmPosition.Unchanged:-20.0,
