@@ -20,13 +20,13 @@ def ScoreCubeHigh(side: int) -> Action:
         OuttakeAction(True, 0.2)
     ])
 
-def ScoreConeHigh(side: int, wrist_goal: int = 0) -> Action:
+def ScoreConeHigh(side: int) -> Action:
     """
     Moves to high cone position, outtakes, and unpinches.
     """
     return SeriesAction([
-        MoveArmAction(Arm_Goal.PRE_SCORE, side, wrist_goal),
-        MoveArmAction(Arm_Goal.HIGH_CONE, side, wrist_goal),
+        MoveArmAction(Arm_Goal.PRE_SCORE, side),
+        MoveArmAction(Arm_Goal.HIGH_CONE, side),
         WaitAction(0.75),
         StopIntakeAction(False, 0.20)
     ])
@@ -40,12 +40,12 @@ def ScoreCubeMiddle(side: int) -> Action:
         OuttakeAction(True, 0.2)
     ])
 
-def ScoreConeMiddle(side: int, wrist_goal: int = 0) -> Action:
+def ScoreConeMiddle(side: int) -> Action:
     """
     Moves to middle cone position, outtakes, and unpinches.
     """
     return SeriesAction([
-        MoveArmAction(Arm_Goal.MID_CONE, side, wrist_goal),
+        MoveArmAction(Arm_Goal.MID_CONE, side),
         WaitAction(0.30),
         StopIntakeAction(False, 0.20)
     ])
@@ -62,13 +62,13 @@ def IntakeConeGround(side: int) -> Action:
         IntakeAction(True, 0.5)
     ])
 
-def IntakeDeadCone(side: int, wrist: int) -> Action:
+def IntakeDeadCone(side: int) -> Action:
     """
     Intakes a dead cone.
     """
     return SeriesAction([
         IntakeAction(False),
-        MoveArmAction(Arm_Goal.GROUND_DEAD_CONE, side, wrist),
+        MoveArmAction(Arm_Goal.GROUND_DEAD_CONE, side),
         WaitAction(0.15),
         IntakeAction(True),
         WaitAction(0.35)
