@@ -3,8 +3,6 @@ from actions_node.default_actions.SeriesAction import SeriesAction
 from actions_node.default_actions.ParallelAction import ParallelAction
 from actions_node.default_actions.WaitAction import WaitAction
 from actions_node.game_specific_actions.MoveArmAction import MoveArmAction
-from actions_node.game_specific_actions.MoveWristAction import MoveWristAction
-from actions_node.game_specific_actions.MoveArmExtensionAction import MoveArmExtensionAction
 from actions_node.game_specific_actions.IntakeAction import IntakeAction
 from actions_node.game_specific_actions.OuttakeAction import OuttakeAction
 from actions_node.game_specific_actions.StopIntakeAction import StopIntakeAction
