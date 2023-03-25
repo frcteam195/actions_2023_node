@@ -8,7 +8,7 @@ from actions_node.game_specific_actions.MoveArmExtensionAction import MoveArmExt
 from actions_node.game_specific_actions.IntakeAction import IntakeAction
 from actions_node.game_specific_actions.OuttakeAction import OuttakeAction
 from actions_node.game_specific_actions.StopIntakeAction import StopIntakeAction
-from actions_node.game_specific_actions.constant import ArmPosition, ArmExtensionPosition, WristPosition
+from actions_node.game_specific_actions.constant import ArmExtensionPosition
 from actions_node.game_specific_actions import constant
 
 from ck_ros_msgs_node.msg import Arm_Goal
