@@ -30,7 +30,7 @@ def ScoreConeHigh(side: int, wrist_goal: int = 0) -> Action:
         MoveArmAction(Arm_Goal.PRE_SCORE, side, wrist_goal),
         MoveArmAction(Arm_Goal.HIGH_CONE, side, wrist_goal),
         # WaitAction(0.30),
-        StopIntakeAction(False, 0.20)
+        StopIntakeAction(False, 0.1)
     ])
 
 def ScoreCubeMiddle(side: int) -> Action:
