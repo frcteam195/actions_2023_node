@@ -69,7 +69,7 @@ def IntakeDeadCone(side: int, wrist: int) -> Action:
     Intakes a dead cone.
     """
     return SeriesAction([
-        IntakeAction(False),
+        IntakeAction(False, -1, 0.35),
         MoveArmAction(Arm_Goal.GROUND_DEAD_CONE, side, wrist, 2, 2),
-        IntakeAction(True, -1, 0.35)
+        IntakeAction(True, 0.25, 0.35)
     ])
