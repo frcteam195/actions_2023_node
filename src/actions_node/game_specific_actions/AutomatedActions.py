@@ -70,8 +70,6 @@ def IntakeDeadCone(side: int, wrist: int) -> Action:
     """
     return SeriesAction([
         IntakeAction(False),
-        MoveArmAction(Arm_Goal.GROUND_DEAD_CONE, side, wrist),
-        WaitAction(0.15),
-        IntakeAction(True),
-        WaitAction(0.35)
+        MoveArmAction(Arm_Goal.GROUND_DEAD_CONE, side, wrist, 2, 2),
+        IntakeAction(True, -1, 0.35)
     ])
