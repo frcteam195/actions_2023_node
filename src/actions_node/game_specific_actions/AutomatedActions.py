@@ -49,7 +49,7 @@ def ScoreConeMiddle(side: int, wrist_goal: int = 0) -> Action:
     return SeriesAction([
         MoveArmAction(Arm_Goal.MID_CONE, side, wrist_goal),
         WaitAction(0.30),
-        StopIntakeAction(False, 0.20)
+        StopIntakeAction(False, 0.10)
     ])
 
 def IntakeConeGround(side: int) -> Action:
