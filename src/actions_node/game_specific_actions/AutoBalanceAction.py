@@ -7,7 +7,7 @@ import rospy
 from actions_node.default_actions.Action import Action
 from actions_node.game_specific_actions.Subsystem import Subsystem
 
-from ck_ros_msgs_node.msg import Swerve_Drivetrain_Auto_Control
+from ck_ros_msgs_node.msg import Led_Control, Swerve_Drivetrain_Auto_Control
 from nav_msgs.msg import Odometry
 from swerve_trajectory_node.srv import StopTrajectory, StopTrajectoryResponse
 
@@ -16,6 +16,9 @@ from ck_utilities_py_node.geometry import *
 
 from frc_robot_utilities_py_node.frc_robot_utilities_py import *
 
+NUM_LEDS = 50
+fire_animation = Led_Control(Led_Control.ANIMATE, Led_Control.FIRE, 0, 0, 0, 0, 0.5, 0.5, NUM_LEDS, "")
+twinkle_purple = Led_Control(Led_Control.ANIMATE, Led_Control.TWINKLE_OFF, 57, 3, 87, 0, 0, 0.25, NUM_LEDS, "")
 
 class BalanceDirection(Enum):
     """
@@ -43,6 +46,9 @@ class AutoBalanceAction(Action):
         self.__desired_quat = self.__desired_rotation.to_msg_quat()
 
         self.__drive_twist_publisher = rospy.Publisher(name="/SwerveAutoControl", data_class=Swerve_Drivetrain_Auto_Control, queue_size=10, tcp_nodelay=True)
+
+        self.__current_leds = twinkle_purple
+        self.__led_control_publisher = rospy.Publisher(name="/LedControl", data_class=Led_Control, queue_size=10, tcp_nodelay=True)
 
         self.__imu_pose = Pose()
         self.__imu_twist = Twist()
@@ -105,11 +111,16 @@ class AutoBalanceAction(Action):
 
             self.__drive_twist_publisher.publish(control_msg)
 
+            self.__led_control_publisher.publish(self.__current_leds)
+
     def done(self):
         control_msg: Swerve_Drivetrain_Auto_Control = Swerve_Drivetrain_Auto_Control()
         control_msg.pose.orientation = self.__desired_quat
         control_msg.x_mode = True
         self.__drive_twist_publisher.publish(control_msg)
+
+        self.__current_leds = fire_animation
+        self.__led_control_publisher.publish(self.__current_leds)
 
     def isFinished(self) -> bool:
         return self.__tipped > 1
