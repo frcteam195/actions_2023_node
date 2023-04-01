@@ -55,6 +55,8 @@ class AutoBalanceAction(Action):
 
         self.__tipped = 0
 
+        self.__start_time = 0
+
     def start(self):
         rospy.logdebug("Starting Auto-Balance Action")
         rospy.logerr("Starting Auto-Balance Action")
@@ -63,7 +65,7 @@ class AutoBalanceAction(Action):
         stop_traj_response: StopTrajectoryResponse = stop_traj()
 
         self.__tipped = 0
-
+        self.__start_time = rospy.get_time()
         if not stop_traj_response.accepted:
             rospy.logerr("Auto-balance failed to stop trajectory!")
 
@@ -103,7 +105,8 @@ class AutoBalanceAction(Action):
             control_msg.twist.linear.x = control_msg.twist.linear.x * output
             control_msg.twist.linear.y = control_msg.twist.linear.y * output
 
-            if abs(attitude_rate) > 0.28:
+            time_passed = rospy.get_time() - self.__start_time
+            if time_passed > 0.1 and abs(attitude_rate) > 0.28:
                 control_msg.x_mode = True
                 self.__tipped += 1
             else:
