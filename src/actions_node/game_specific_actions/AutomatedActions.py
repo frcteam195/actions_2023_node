@@ -64,12 +64,12 @@ def IntakeConeGround(side: int) -> Action:
         IntakeAction(True, 0.5)
     ])
 
-def IntakeDeadCone(side: int, wrist: int) -> Action:
+def IntakeDeadCone(side: int, wrist: int, keep_running : bool = False) -> Action:
     """
     Intakes a dead cone.
     """
     return SeriesAction([
-        IntakeAction(True, -1, 0.35),
+        IntakeAction(False, -1, 0.35),
         MoveArmAction(Arm_Goal.GROUND_DEAD_CONE, side, wrist, 5, 5),
-        IntakeAction(True, 0.25, 0.35)
+        (IntakeAction(True, 0.35, 0.35) if not keep_running else IntakeAction(True, -1, 0.35))
     ])
