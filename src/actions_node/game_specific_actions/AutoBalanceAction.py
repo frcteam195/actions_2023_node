@@ -97,7 +97,7 @@ class AutoBalanceAction(Action):
             # rospy.loginfo(f"PitchRate: {degrees(self.__imu_twist.angular.pitch)},  RollRate: {degrees(self.__imu_twist.angular.roll)}")
 
             KP = 0.005
-            BASE_MAX_SPEED = 0.5
+            BASE_MAX_SPEED = 0.48
 
             output = KP * np.sign(attitude) * pow(degrees(attitude), 2)
             output = limit(output, -BASE_MAX_SPEED, BASE_MAX_SPEED)
@@ -106,7 +106,7 @@ class AutoBalanceAction(Action):
             control_msg.twist.linear.y = control_msg.twist.linear.y * output
 
             time_passed = rospy.get_time() - self.__start_time
-            if time_passed > 0.1 and abs(attitude_rate) > 0.28:
+            if time_passed > 0.075 and abs(attitude_rate) > 0.28:
                 control_msg.x_mode = True
                 self.__tipped += 1
             else:
