@@ -97,7 +97,7 @@ class AutoBalanceAction(Action):
             # rospy.loginfo(f"PitchRate: {degrees(self.__imu_twist.angular.pitch)},  RollRate: {degrees(self.__imu_twist.angular.roll)}")
 
             KP = 0.005
-            BASE_MAX_SPEED = 0.48
+            BASE_MAX_SPEED = 0.44
 
             output = KP * np.sign(attitude) * pow(degrees(attitude), 2)
             output = limit(output, -BASE_MAX_SPEED, BASE_MAX_SPEED)
